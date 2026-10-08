@@ -162,21 +162,22 @@ export default function App() {
             <small>Delivery takes {MATERIAL_DELIVERY_TIME} seconds.</small>
           </div>
           <div className="panel">
-            <h2>Build</h2>
+            <h2>Buildings guide</h2>
+            <small className="hint">Tap an empty lot on the map to build.</small>
             <div className="tools">
               {BUILDING_ORDER.map((t) => {
                 const def = BUILDINGS[t]
                 return (
-                  <div key={t} className={'tool' + (canAfford(game, t) ? '' : ' poor')} title={def.desc}>
+                  <div key={t} className={'tool info' + (canAfford(game, t) ? '' : ' poor')} title={def.desc}>
                     <b>{def.icon} {def.name}</b>
                     <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.buildTime}s</small>
                     <small>{def.desc}</small>
                   </div>
                 )
               })}
-              <button className={'tool' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool('demolish')}>
-                <b>💥 Demolish</b>
-                <small>Refunds 50% of cost</small>
+              <button className={'tool' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}>
+                <b>💥 Demolish {tool === 'demolish' ? '(on)' : ''}</b>
+                <small>{tool === 'demolish' ? 'Tap a building to demolish; tap here to cancel' : 'Refunds 50% of cost'}</small>
               </button>
             </div>
             <button className="gather" onClick={() => setGame(gather)}>🪵 Chop wood (+5)</button>
