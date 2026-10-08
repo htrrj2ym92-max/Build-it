@@ -89,6 +89,7 @@ export default function App() {
       </div>
 
       <main>
+        <div className="board-wrap">
         <section className="board" aria-label="Neighborhood building lots" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
           {game.grid.map((c, i) => (
             <button
@@ -117,6 +118,12 @@ export default function App() {
             </button>
           ))}
         </section>
+        <div className="dock" role="toolbar" aria-label="Quick actions">
+          <button className="dock-btn wood" onClick={() => setGame(gather)}><span>🪵</span>Chop wood</button>
+          <button className={'dock-btn danger' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}><span>💥</span>{tool === 'demolish' ? 'Tap building' : 'Demolish'}</button>
+          <button className="dock-btn" onClick={() => setPaused((value) => !value)} aria-pressed={paused}><span>{paused ? '▶' : '⏸'}</span>{paused ? 'Resume' : 'Pause'}</button>
+        </div>
+        </div>
 
         <aside>
           <div className="panel">
@@ -175,12 +182,7 @@ export default function App() {
                   </div>
                 )
               })}
-              <button className={'tool' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}>
-                <b>💥 Demolish {tool === 'demolish' ? '(on)' : ''}</b>
-                <small>{tool === 'demolish' ? 'Tap a building to demolish; tap here to cancel' : 'Refunds 50% of cost'}</small>
-              </button>
             </div>
-            <button className="gather" onClick={() => setGame(gather)}>🪵 Chop wood (+5)</button>
           </div>
         </aside>
       </main>
