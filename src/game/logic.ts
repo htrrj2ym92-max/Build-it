@@ -1,7 +1,5 @@
 import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
-import type { BuildingType, Cell, GameState, Resource, Resources } from './types'
-
-const RES: Resource[] = ['materials']
+import type { BuildingType, Cell, GameState } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
 
@@ -96,13 +94,13 @@ export function maintain(g: GameState, index: number): GameState {
   return updateCell(g, index, (c) => ({ ...c, condition: 100 }), maintainCost(cell))
 }
 
-export const workerHireCost = (g: GameState, workers: number) => {
+export const workerHireCost = (workers: number) => {
   if (!Number.isInteger(workers) || workers < 1 || workers > WORKER_HIRE_COSTS.length) return Infinity
   return WORKER_HIRE_COSTS[workers - 1]
 }
 
 export function hireWorkers(g: GameState, workers: number): GameState {
-  const cost = workerHireCost(g, workers)
+  const cost = workerHireCost(workers)
   if (!Number.isFinite(cost) || g.money < cost) return g
   return { ...g, money: g.money - cost, hiredWorkers: (g.hiredWorkers ?? 0) + workers }
 }
@@ -130,11 +128,6 @@ export function orderMaterials(g: GameState): GameState {
   }
 }
 
-export function income(g: GameState): Resources {
-  void g
-  return { materials: 0 }
-}
-
 const houseRent = (c: Cell) => (c.type && isOwned(c) ? BUILDINGS[c.type].rentPerDay * (1 + c.level / 2) : 0)
 
 export const rentalIncome = (g: GameState) => g.grid.reduce((sum, c) => sum + houseRent(c), 0)
@@ -151,9 +144,7 @@ export function goalProgress(g: GameState) {
 
 export function tick(g: GameState): GameState {
   if (g.won) return g
-  const inc = income(g)
   const resources = { ...g.resources }
-  RES.forEach((k) => (resources[k] += inc[k]))
   const ticks = g.ticks + 1
   const decay = ticks % CONDITION_DECAY_TICKS === 0
   const deliveries = g.deliveries.filter((delivery) => delivery.remaining > 1)
@@ -179,7 +170,7 @@ export function isValid(s: unknown): s is GameState {
   return (
     !!g && g.version === 2 && typeof g.level === 'number' && g.level >= 0 &&
     Array.isArray(g.grid) && g.grid.length === levelDef(g.level).size ** 2 &&
-    !!g.resources && RES.every((k) => typeof g.resources[k] === 'number') &&
+    !!g.resources && typeof g.resources.materials === 'number' &&
     (g.hiredWorkers === undefined || (Number.isInteger(g.hiredWorkers) && g.hiredWorkers >= 0)) &&
     (g.deliveries === undefined || (Array.isArray(g.deliveries) && g.deliveries.every((delivery) =>
       delivery &&

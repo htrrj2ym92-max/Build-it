@@ -1,7 +1,7 @@
 import { useId, type ReactNode } from 'react'
 import type { BuildingType } from './types'
 
-const art: Record<BuildingType, ReactNode> = {
+const art: Record<string, ReactNode> = {
   house: (
     <>
       <path fill="#f5c66b" stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="M29 47 67 32l28 15v39L67 99 29 83Z" />
@@ -112,17 +112,24 @@ const art: Record<BuildingType, ReactNode> = {
   ),
 }
 
+const homeArt: Record<BuildingType, ReactNode> = {
+  rambler: art.house,
+  colonial: art.market,
+  tudor: art.workshop,
+  estate: art.hut,
+  mansion: art.tower,
+  castle: art.castle,
+}
+
 export default function BuildingArt({ type, progress = 1, level = 0 }: { type: BuildingType; progress?: number; level?: number }) {
   const clipId = useId().replace(/:/g, '')
   const reveal = progress >= 1 ? 1 : progress < 0.25 ? 0 : progress < 0.55 ? 0.52 : 0.88
   const foundationColors: Record<BuildingType, string> = {
-    house: '#d8b982',
-    lumber: '#bd8c5b',
-    quarry: '#9aa39d',
-    market: '#d7c69d',
-    hut: '#bda47c',
-    workshop: '#bd9a6e',
-    tower: '#aeb8b5',
+    rambler: '#d8b982',
+    colonial: '#d7c69d',
+    tudor: '#bd9a6e',
+    estate: '#bda47c',
+    mansion: '#aeb8b5',
     castle: '#aeb8b5',
   }
 
@@ -145,7 +152,7 @@ export default function BuildingArt({ type, progress = 1, level = 0 }: { type: B
               <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
             </clipPath>
           </defs>
-          <g clipPath={`url(#${clipId})`}>{art[type]}</g>
+          <g clipPath={`url(#${clipId})`}>{homeArt[type]}</g>
           {progress >= 1 && level >= 1 && (
             <>
               <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />

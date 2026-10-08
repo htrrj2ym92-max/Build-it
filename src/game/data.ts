@@ -1,4 +1,4 @@
-import type { BuildingType, Resources } from './types'
+import type { BuildingType } from './types'
 
 export interface BuildingDef {
   name: string
@@ -24,7 +24,7 @@ export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', '
 
 export interface Level {
   size: number
-  goal: { buildings?: Partial<Record<BuildingType, number>>; gold?: number }
+  goal: { buildings?: Partial<Record<BuildingType, number>> }
 }
 
 export const LEVELS: Level[] = [

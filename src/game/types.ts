@@ -18,8 +18,6 @@ export interface Cell {
   condition: number
   /** sold to someone else: stays on the lot but no longer owned */
   sold: boolean
-  /** inspection protects the building from its next condition decay */
-  inspected?: boolean
 }
 
 export interface GameState {
@@ -29,7 +27,6 @@ export interface GameState {
   deliveries: MaterialDelivery[]
   money: number
   hiredWorkers?: number
-  efficiencyTrained?: boolean
   grid: Cell[]
   ticks: number
   won: boolean
