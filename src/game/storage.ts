@@ -11,9 +11,8 @@ export function loadGame(): GameState {
         ...parsed,
         money: parsed.money ?? STARTING_MONEY,
         deliveries: parsed.deliveries ?? [],
-        grid: parsed.grid.map((c) => ({ ...c, level: c.level ?? 0, condition: c.condition ?? 100, sold: c.sold === true, inspected: c.inspected === true })),
+        grid: parsed.grid.map((c) => ({ ...c, lotOwned: c.lotOwned === true, level: c.level ?? 0, condition: c.condition ?? 100, sold: c.sold === true })),
         hiredWorkers: parsed.hiredWorkers ?? 0,
-        efficiencyTrained: parsed.efficiencyTrained ?? false,
       }
     }
   } catch {

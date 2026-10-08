@@ -1,50 +1,48 @@
-import type { BuildingType, Resources } from './types'
+import type { BuildingType } from './types'
 
 export interface BuildingDef {
   name: string
   icon: string
-  cost: Partial<Resources>
+  cost: number
   cashCost: number
+  workers: number
+  rentPerDay: number
   buildTime: number
-  produces: Partial<Resources>
   desc: string
 }
 
 export const BUILDINGS: Record<BuildingType, BuildingDef> = {
-  house: { name: 'House', icon: '🏠', cost: { wood: 20, stone: 5 }, cashCost: 5000, buildTime: 3, produces: { gold: 1 }, desc: 'Residents pay +1 gold/s and $800/day rent' },
-  lumber: { name: 'Lumber Mill', icon: '🪚', cost: { gold: 10, stone: 5 }, cashCost: 8000, buildTime: 3, produces: { wood: 2 }, desc: '+2 wood/s' },
-  quarry: { name: 'Quarry', icon: '⛏️', cost: { wood: 25, gold: 10 }, cashCost: 12000, buildTime: 4, produces: { stone: 1 }, desc: '+1 stone/s' },
-  market: { name: 'Market', icon: '🏪', cost: { wood: 40, stone: 20 }, cashCost: 15000, buildTime: 6, produces: { gold: 4 }, desc: '+4 gold/s' },
-  hut: { name: "Builder's Hut", icon: '🔨', cost: { wood: 30, stone: 15, gold: 20 }, cashCost: 10000, buildTime: 5, produces: {}, desc: '+1 builder (build in parallel)' },
-  workshop: { name: 'Workshop', icon: '🛠️', cost: { wood: 450, stone: 450 }, cashCost: 0, buildTime: 10, produces: {}, desc: 'Requires 3 workers and 900 materials; halves worker hiring costs, enables house inspections and Efficiency Training' },
-  tower: { name: 'Tower', icon: '🏰', cost: { wood: 80, stone: 80, gold: 80 }, cashCost: 25000, buildTime: 10, produces: { gold: 2 }, desc: 'Landmark, +2 gold/s' },
-  castle: { name: 'Castle', icon: '🏯', cost: { wood: 150, stone: 180, gold: 120 }, cashCost: 40000, buildTime: 14, produces: { gold: 5 }, desc: 'Grand fortress, +5 gold/s' },
+  rambler: { name: 'Rambler', icon: '🏠', cost: 75, cashCost: 50000, workers: 1, rentPerDay: 800, buildTime: 3, desc: 'Entry-level home · $800/day rent' },
+  colonial: { name: 'Colonial', icon: '🏡', cost: 150, cashCost: 75000, workers: 2, rentPerDay: 1200, buildTime: 4, desc: 'Modest mid-tier home · $1,200/day rent' },
+  tudor: { name: 'Tudor', icon: '🏘️', cost: 300, cashCost: 150000, workers: 3, rentPerDay: 2400, buildTime: 6, desc: 'Stylish family home · $2,400/day rent' },
+  estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 300000, workers: 5, rentPerDay: 4800, buildTime: 8, desc: 'High-value upscale residence · $4,800/day rent' },
+  mansion: { name: 'Mansion', icon: '🏰', cost: 1200, cashCost: 600000, workers: 7, rentPerDay: 9600, buildTime: 10, desc: 'Luxury premium property · $9,600/day rent' },
+  castle: { name: 'Castle', icon: '🏯', cost: 2500, cashCost: 1200000, workers: 9, rentPerDay: 19200, buildTime: 14, desc: 'Ultimate high-rent property · $19,200/day rent' },
 }
 
-export const BUILDING_ORDER: BuildingType[] = ['house', 'lumber', 'quarry', 'market', 'hut', 'workshop', 'tower', 'castle']
+export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', 'estate', 'mansion', 'castle']
 
 export interface Level {
   size: number
-  goal: { buildings?: Partial<Record<BuildingType, number>>; gold?: number }
+  goal: { buildings?: Partial<Record<BuildingType, number>> }
 }
 
 export const LEVELS: Level[] = [
-  { size: 2, goal: { buildings: { house: 3, lumber: 1 } } },
-  { size: 5, goal: { buildings: { house: 4, quarry: 1, market: 1 } } },
-  { size: 6, goal: { buildings: { house: 6, hut: 1, market: 2 }, gold: 100 } },
-  { size: 6, goal: { buildings: { house: 8, market: 3, quarry: 2 }, gold: 200 } },
-  { size: 7, goal: { buildings: { house: 10, market: 4, hut: 2, tower: 1 }, gold: 300 } },
+  { size: 2, goal: { buildings: { rambler: 1 } } },
+  { size: 3, goal: { buildings: { rambler: 2 } } },
+  { size: 4, goal: { buildings: { rambler: 3 } } },
+  { size: 5, goal: { buildings: { rambler: 4 } } },
+  { size: 6, goal: { buildings: { rambler: 5 } } },
 ]
 
+export const LOT_COST = 25_000
 export const MAX_UPGRADE = 3
 export const CONDITION_DECAY_TICKS = 10
 export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
 export const WORKER_HIRE_COSTS = [50_000, 90_000, 120_000] as const
-export const EFFICIENCY_TRAINING_COST = 75_000
-export const HOUSE_RENT_PER_DAY = 800
 export const TICKS_PER_DAY = 60
 export const MATERIAL_ORDER_AMOUNT = 10
 export const MATERIAL_DELIVERY_TIME = 10
-export const MATERIAL_ORDER_COST = { wood: 1000, stone: 1500 } as const
-export const SAVE_KEY = 'build-it-save-v1'
+export const MATERIAL_ORDER_COST = 1000
+export const SAVE_KEY = 'build-it-save-v2'

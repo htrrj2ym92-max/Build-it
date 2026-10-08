@@ -2,7 +2,7 @@
 
 A browser city-building game inspired by Build-a-lot. React + TypeScript + Vite.
 
-Place buildings on the grid, manage wood/stone/gold, use limited builders (build Builder's Huts for more), and complete each level's goals. Progress is saved automatically to localStorage.
+Buy unowned lots for $25,000, then build one of six home types using materials and the required number of workers. Gather or order materials, collect rent from completed homes, and complete each level's goals. Progress is saved automatically to localStorage.
 
 ## Develop
 ```

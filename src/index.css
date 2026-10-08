@@ -64,11 +64,12 @@ header button { background: #6b7d5f; }
 .cell svg { transform: scale(1.4); transform-origin: 50% 62%; filter: drop-shadow(0 6px 4px #2a43284d); }
 @keyframes pop { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1.4); } }
 .cell:not(.built):not(.building)::after { content: '+'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 2rem; font-weight: 700; color: #ffffff99; }
+.cell.unowned { background: linear-gradient(145deg,#b5c79a,#8ca477); border-style: dashed; }
 .cell.built, .cell.building { overflow: visible; z-index: 1; }
 .dock { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px auto 4px; max-width: min(100%, 70vh); }
 .dock-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 60px; font-weight: 700; background: linear-gradient(#5f9a3a,#3f7a28); border-bottom: 4px solid #2c571d; border-radius: 14px; }
 .dock-btn span { font-size: 1.4rem; line-height: 1; }
-.dock-btn.wood { background: linear-gradient(#b27a3e,#8a5a2b); border-bottom-color: #5f3d1b; }
+.dock-btn.materials { background: linear-gradient(#7e9a6a,#5d7949); border-bottom-color: #405633; }
 .dock-btn.danger { background: linear-gradient(#d9694f,#b44a35); border-bottom-color: #7e2f21; }
 .dock-btn.active { outline: 3px solid #f6d77a; }
 .panel { border: 2px solid #f6f4d8; border-radius: 14px; }

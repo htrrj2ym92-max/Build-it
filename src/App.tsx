@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, EFFICIENCY_TRAINING_COST, LEVELS, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
-import { build, builders, busyBuilders, canBuild, demolish, gather, goalProgress, hasWorkshop, hireWorkers, income, inspect, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, trainEfficiency, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { build, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -23,11 +23,9 @@ export default function App() {
   useEffect(() => saveGame(game), [game])
 
   const size = Math.sqrt(game.grid.length)
-  const inc = income(game)
   const rent = rentalIncome(game)
   const goals = goalProgress(game)
   const free = builders(game) - busyBuilders(game)
-  const workshopBuilt = hasWorkshop(game)
   const gameDay = Math.floor(game.ticks / TICKS_PER_DAY) + 1
   const gameHour = Math.floor((game.ticks % TICKS_PER_DAY) * 24 / TICKS_PER_DAY)
 
@@ -57,9 +55,7 @@ export default function App() {
   const sel = selectedBuilding !== null ? game.grid[selectedBuilding] : null
 
   const costLabel = (type: BuildingType) =>
-    Object.entries(BUILDINGS[type].cost)
-      .map(([k, v]) => `${v}${k === 'wood' ? '🪵' : k === 'stone' ? '🪨' : '💰'}`)
-      .join(' ')
+    `${BUILDINGS[type].cost.toLocaleString()} materials`
 
   const reset = () => {
     if (window.confirm('Start over? All progress will be lost.')) {
@@ -83,9 +79,7 @@ export default function App() {
         <button className="pause" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
           {paused ? '▶ Resume' : '⏸ Pause'}
         </button>
-        <span>🪵 {Math.floor(game.resources.wood)} <small>+{inc.wood}/s</small></span>
-        <span>🪨 {Math.floor(game.resources.stone)} <small>+{inc.stone}/s</small></span>
-        <span>💰 {Math.floor(game.resources.gold)} <small>+{inc.gold}/s</small></span>
+        <span>🧱 {Math.floor(game.resources.materials)} materials</span>
         <span>👷 {free}/{builders(game)}</span>
       </div>
 
@@ -95,9 +89,9 @@ export default function App() {
           {game.grid.map((c, i) => (
             <button
               key={i}
-              className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : '')}
+              className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : c.lotOwned ? '' : ' unowned')}
               onClick={() => onCell(i)}
-              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : 'Empty plot'}
+              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
             >
               {c.type && (
                 <BuildingArt
@@ -120,7 +114,7 @@ export default function App() {
           ))}
         </section>
         <div className="dock" role="toolbar" aria-label="Quick actions">
-          <button className="dock-btn wood" onClick={() => setGame(gather)}><span>🪵</span>Chop wood</button>
+          <button className="dock-btn materials" onClick={() => setGame(gather)}><span>🧱</span>Gather materials</button>
           <button className={'dock-btn danger' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}><span>💥</span>{tool === 'demolish' ? 'Tap building' : 'Demolish'}</button>
           <button className="dock-btn" onClick={() => setPaused((value) => !value)} aria-pressed={paused}><span>{paused ? '▶' : '⏸'}</span>{paused ? 'Resume' : 'Pause'}</button>
         </div>
@@ -139,28 +133,18 @@ export default function App() {
           </div>
           <div className="panel materials-panel">
             <h2>Construction materials</h2>
-            <div className="material-inventory">
-              <span>🪵 Wood <b>{Math.floor(game.resources.wood)}</b></span>
-              <span>🪨 Stone <b>{Math.floor(game.resources.stone)}</b></span>
-            </div>
+            <div className="material-inventory"><span>🧱 Materials <b>{Math.floor(game.resources.materials)}</b></span></div>
             <div className="tools">
-              {(['wood', 'stone'] as const).map((material) => (
-                <button
-                  key={material}
-                  className="tool"
-                  disabled={game.money < MATERIAL_ORDER_COST[material]}
-                  onClick={() => setGame((g) => orderMaterials(g, material))}
-                >
-                  <b>Order {material}</b>
-                  <small>+{MATERIAL_ORDER_AMOUNT} · ${MATERIAL_ORDER_COST[material].toLocaleString()}</small>
-                </button>
-              ))}
+              <button className="tool" disabled={game.money < MATERIAL_ORDER_COST} onClick={() => setGame(orderMaterials)}>
+                <b>Order materials</b>
+                <small>+{MATERIAL_ORDER_AMOUNT} · ${MATERIAL_ORDER_COST.toLocaleString()}</small>
+              </button>
             </div>
             {game.deliveries.length > 0 ? (
               <ul className="deliveries" aria-label="Incoming material deliveries">
                 {game.deliveries.map((delivery, index) => (
-                  <li key={`${delivery.material}-${index}`}>
-                    {delivery.material === 'wood' ? '🪵' : '🪨'} {delivery.quantity} {delivery.material} · arrives in {delivery.remaining}s
+                  <li key={index}>
+                    🧱 {delivery.quantity} materials · arrives in {delivery.remaining}s
                   </li>
                 ))}
               </ul>
@@ -171,11 +155,11 @@ export default function App() {
           </div>
           <div className="panel">
             <h2>Workers</h2>
-            <small className="hint">Hire workers for parallel construction. A Workshop halves hiring costs.</small>
+            <small className="hint">Homes require the listed number of workers while under construction.</small>
             <div className="tools">
               {WORKER_HIRE_COSTS.map((_, index) => {
                 const workers = index + 1
-                const cost = workerHireCost(game, workers)
+                const cost = workerHireCost(workers)
                 return (
                   <button key={workers} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => hireWorkers(g, workers))}>
                     <b>Hire {workers} worker{workers === 1 ? '' : 's'}</b>
@@ -185,27 +169,17 @@ export default function App() {
               })}
             </div>
           </div>
-          {workshopBuilt && (
-            <div className="panel training-panel">
-              <h2>Workshop training</h2>
-              <button className="tool" disabled={game.efficiencyTrained || game.money < EFFICIENCY_TRAINING_COST} onClick={() => setGame(trainEfficiency)}>
-                <b>⚙️ Efficiency Training</b>
-                <small>{game.efficiencyTrained ? 'Trained · construction speed doubled' : `$${EFFICIENCY_TRAINING_COST.toLocaleString()} · doubles construction speed`}</small>
-              </button>
-            </div>
-          )}
           <div className="panel">
             <h2>Buildings guide</h2>
-            <small className="hint">Tap an empty lot on the map to build.</small>
+            <small className="hint">Buy a lot for ${LOT_COST.toLocaleString()}, then choose a home.</small>
             <div className="tools">
               {BUILDING_ORDER.map((t) => {
                 const def = BUILDINGS[t]
                 return (
                   <div key={t} className={'tool info' + (canBuild(game, t) ? '' : ' poor')} title={def.desc}>
                     <b>{def.icon} {def.name}</b>
-                    <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.buildTime}s</small>
+                    <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.workers} worker{def.workers === 1 ? '' : 's'}</small>
                     <small>{def.desc}</small>
-                    {t === 'workshop' && builders(game) < 3 && <small>Requires 3 workers ({builders(game)}/3)</small>}
                   </div>
                 )
               })}
@@ -242,12 +216,6 @@ export default function App() {
                   <b>🔧 Maintain</b>
                   <small>{sel.condition >= 100 ? 'In perfect shape' : `$${maintainCost(sel).toLocaleString()}`}</small>
                 </button>
-                {sel.type === 'house' && workshopBuilt && (
-                  <button className="tool" disabled={sel.inspected === true} onClick={() => act(inspect)}>
-                    <b>🔍 Inspect house</b>
-                    <small>{sel.inspected ? 'Protected from next damage check' : 'Prevents the next condition loss'}</small>
-                  </button>
-                )}
                 <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
                   <b>💵 Sell</b>
                   <small>Get ${salePrice(sel).toLocaleString()}</small>
@@ -266,22 +234,36 @@ export default function App() {
       {selectedLot !== null && (
         <div className="overlay" onClick={() => setSelectedLot(null)}>
           <div className="modal build-modal" role="dialog" aria-modal="true" aria-labelledby="build-title" onClick={(event) => event.stopPropagation()}>
-            <h2 id="build-title">Choose a building</h2>
-            <p>Lot {selectedLot + 1} · {free > 0 ? `${free} builder${free === 1 ? '' : 's'} available` : 'No builders available'}</p>
-            <div className="build-options">
-              {BUILDING_ORDER.map((type) => {
-                const def = BUILDINGS[type]
-                const affordable = canBuild(game, type)
-                return (
-                  <button key={type} className={'tool' + (affordable && free > 0 ? '' : ' poor')} disabled={!affordable || free <= 0} onClick={() => constructAt(type)}>
-                    <b>{def.icon} {def.name}</b>
-                    <small>${def.cashCost.toLocaleString()} · {costLabel(type)} · {def.buildTime}s</small>
-                    <small>{def.desc}</small>
-                    {type === 'workshop' && builders(game) < 3 && <small>Requires 3 workers ({builders(game)}/3)</small>}
-                  </button>
-                )
-              })}
-            </div>
+            {game.grid[selectedLot] && !game.grid[selectedLot].lotOwned ? (
+              <>
+                <h2 id="build-title">Buy lot {selectedLot + 1}</h2>
+                <p>Purchase this empty lot for ${LOT_COST.toLocaleString()}.</p>
+                <button disabled={game.money < LOT_COST} onClick={() => {
+                  setGame((g) => buyLot(g, selectedLot))
+                  setSelectedLot(null)
+                }}>Buy lot · ${LOT_COST.toLocaleString()}</button>
+              </>
+            ) : (
+              <>
+                <h2 id="build-title">Choose a home</h2>
+                <p>Lot {selectedLot + 1} · {free > 0 ? `${free} worker${free === 1 ? '' : 's'} available` : 'No workers available'}</p>
+                <div className="build-options">
+                  {BUILDING_ORDER.map((type) => {
+                    const def = BUILDINGS[type]
+                    const affordable = canBuild(game, type)
+                    const enoughWorkers = free >= def.workers
+                    return (
+                      <button key={type} className={'tool' + (affordable && enoughWorkers ? '' : ' poor')} disabled={!affordable || !enoughWorkers} onClick={() => constructAt(type)}>
+                        <b>{def.icon} {def.name}</b>
+                        <small>${def.cashCost.toLocaleString()} · {costLabel(type)}</small>
+                        <small>{def.workers} worker{def.workers === 1 ? '' : 's'} · {def.buildTime}s</small>
+                        <small>{def.desc}</small>
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
             <button className="cancel-build" onClick={() => setSelectedLot(null)}>Cancel</button>
           </div>
         </div>
