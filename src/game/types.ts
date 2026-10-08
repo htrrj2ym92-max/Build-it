@@ -1,16 +1,15 @@
-export type Resource = 'wood' | 'stone' | 'gold'
+export type Resource = 'materials'
 export type Resources = Record<Resource, number>
-export type Material = 'wood' | 'stone'
-export type BuildingType = 'house' | 'lumber' | 'quarry' | 'market' | 'hut' | 'workshop' | 'tower' | 'castle'
+export type BuildingType = 'rambler' | 'colonial' | 'tudor' | 'estate' | 'mansion' | 'castle'
 
 export interface MaterialDelivery {
-  material: Material
   quantity: number
   remaining: number
 }
 
 export interface Cell {
   type: BuildingType | null
+  lotOwned: boolean
   /** seconds of construction left; 0 = finished */
   remaining: number
   /** upgrade level, 0..MAX_LEVEL */
