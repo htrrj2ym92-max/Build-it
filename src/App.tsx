@@ -82,11 +82,11 @@ export default function App() {
               )}
               {c.type && c.remaining > 0 && (
                 <span className="timer">
-                  {c.remaining === BUILDINGS[c.type].buildTime
+                  {(BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime < 0.25
                     ? 'Foundation'
-                    : c.remaining / BUILDINGS[c.type].buildTime <= 0.45
-                      ? 'Nearly complete'
-                      : 'Building'} · {c.remaining}s
+                    : (BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime < 0.55
+                      ? 'Building'
+                      : 'Nearly complete'} · {c.remaining}s
                 </span>
               )}
             </button>
