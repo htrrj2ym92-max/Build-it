@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, TICKS_PER_DAY } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, newGame, nextLevel, rentalIncome, tick } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
@@ -26,8 +26,8 @@ export default function App() {
   const rent = rentalIncome(game)
   const goals = goalProgress(game)
   const free = builders(game) - busyBuilders(game)
-  const gameDay = Math.floor(game.ticks / 60) + 1
-  const gameHour = Math.floor((game.ticks % 60) * 24 / 60)
+  const gameDay = Math.floor(game.ticks / TICKS_PER_DAY) + 1
+  const gameHour = Math.floor((game.ticks % TICKS_PER_DAY) * 24 / TICKS_PER_DAY)
 
   const onCell = (i: number) => {
     if (tool === 'demolish') {
@@ -122,7 +122,7 @@ export default function App() {
               {BUILDING_ORDER.map((t) => {
                 const def = BUILDINGS[t]
                 return (
-                  <div key={t} className={'tool' + (canAfford(game.resources, t) ? '' : ' poor')} title={def.desc}>
+                  <div key={t} className={'tool' + (canAfford(game, t) ? '' : ' poor')} title={def.desc}>
                     <b>{def.icon} {def.name}</b>
                     <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.buildTime}s</small>
                     <small>{def.desc}</small>
