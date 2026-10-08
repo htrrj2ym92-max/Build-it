@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
+import LotArt from './game/LotArt'
 import { build, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
@@ -93,6 +94,7 @@ export default function App() {
               onClick={() => onCell(i)}
               aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
             >
+              <LotArt owned={c.lotOwned} built={!!c.type} />
               {c.type && (
                 <BuildingArt
                   type={c.type}
