@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS } from './game/data'
+import BuildingArt from './game/BuildingArt'
 import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, newGame, nextLevel, tick } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
@@ -47,15 +48,15 @@ export default function App() {
       </div>
 
       <main>
-        <section className="board" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
+        <section className="board" aria-label="Neighborhood building lots" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
           {game.grid.map((c, i) => (
             <button
               key={i}
               className={'cell' + (c.type ? (c.remaining ? ' building' : ' built') : '')}
               onClick={() => onCell(i)}
-              aria-label={c.type ? BUILDINGS[c.type].name : 'Empty plot'}
+              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : ''}` : 'Empty plot'}
             >
-              {c.type ? BUILDINGS[c.type].icon : ''}
+              {c.type && <BuildingArt type={c.type} />}
               {c.type && c.remaining > 0 && <span className="timer">{c.remaining}s</span>}
             </button>
           ))}
