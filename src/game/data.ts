@@ -26,7 +26,7 @@ export interface Level {
 }
 
 export const LEVELS: Level[] = [
-  { size: 5, goal: { buildings: { house: 3, lumber: 1 } } },
+  { size: 2, goal: { buildings: { house: 3, lumber: 1 } } },
   { size: 5, goal: { buildings: { house: 4, quarry: 1, market: 1 } } },
   { size: 6, goal: { buildings: { house: 6, hut: 1, market: 2 }, gold: 100 } },
   { size: 6, goal: { buildings: { house: 8, market: 3, quarry: 2 }, gold: 200 } },
