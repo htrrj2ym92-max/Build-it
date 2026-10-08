@@ -16,11 +16,12 @@ export const BUILDINGS: Record<BuildingType, BuildingDef> = {
   quarry: { name: 'Quarry', icon: '⛏️', cost: { wood: 25, gold: 10 }, cashCost: 12000, buildTime: 4, produces: { stone: 1 }, desc: '+1 stone/s' },
   market: { name: 'Market', icon: '🏪', cost: { wood: 40, stone: 20 }, cashCost: 15000, buildTime: 6, produces: { gold: 4 }, desc: '+4 gold/s' },
   hut: { name: "Builder's Hut", icon: '🔨', cost: { wood: 30, stone: 15, gold: 20 }, cashCost: 10000, buildTime: 5, produces: {}, desc: '+1 builder (build in parallel)' },
+  workshop: { name: 'Workshop', icon: '🛠️', cost: { wood: 450, stone: 450 }, cashCost: 0, buildTime: 10, produces: {}, desc: 'Requires 3 workers and 900 materials; halves worker hiring costs, enables house inspections and Efficiency Training' },
   tower: { name: 'Tower', icon: '🏰', cost: { wood: 80, stone: 80, gold: 80 }, cashCost: 25000, buildTime: 10, produces: { gold: 2 }, desc: 'Landmark, +2 gold/s' },
   castle: { name: 'Castle', icon: '🏯', cost: { wood: 150, stone: 180, gold: 120 }, cashCost: 40000, buildTime: 14, produces: { gold: 5 }, desc: 'Grand fortress, +5 gold/s' },
 }
 
-export const BUILDING_ORDER: BuildingType[] = ['house', 'lumber', 'quarry', 'market', 'hut', 'tower', 'castle']
+export const BUILDING_ORDER: BuildingType[] = ['house', 'lumber', 'quarry', 'market', 'hut', 'workshop', 'tower', 'castle']
 
 export interface Level {
   size: number
@@ -39,6 +40,8 @@ export const MAX_UPGRADE = 3
 export const CONDITION_DECAY_TICKS = 10
 export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
+export const WORKER_HIRE_COSTS = [50_000, 90_000, 120_000] as const
+export const EFFICIENCY_TRAINING_COST = 75_000
 export const HOUSE_RENT_PER_DAY = 800
 export const TICKS_PER_DAY = 60
 export const MATERIAL_ORDER_AMOUNT = 10
