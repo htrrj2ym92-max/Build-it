@@ -35,6 +35,8 @@ export const LEVELS: Level[] = [
   { size: 7, goal: { buildings: { house: 10, market: 4, hut: 2, tower: 1 }, gold: 300 } },
 ]
 
+export const MAX_UPGRADE = 3
+export const CONDITION_DECAY_TICKS = 10
 export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
 export const HOUSE_RENT_PER_DAY = 800

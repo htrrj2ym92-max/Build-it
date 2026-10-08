@@ -7,7 +7,11 @@ export function loadGame(): GameState {
     const raw = localStorage.getItem(SAVE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
-      if (isValid(parsed)) return { ...parsed, money: parsed.money ?? STARTING_MONEY }
+      if (isValid(parsed)) return {
+        ...parsed,
+        money: parsed.money ?? STARTING_MONEY,
+        grid: parsed.grid.map((c) => ({ ...c, level: c.level ?? 0, condition: c.condition ?? 100, sold: c.sold === true })),
+      }
     }
   } catch {
     /* ignore corrupt or unavailable storage */

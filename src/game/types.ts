@@ -6,6 +6,12 @@ export interface Cell {
   type: BuildingType | null
   /** seconds of construction left; 0 = finished */
   remaining: number
+  /** upgrade level, 0..MAX_LEVEL */
+  level: number
+  /** 0..100, decays over time; restored by maintenance */
+  condition: number
+  /** sold to someone else: stays on the lot but no longer owned */
+  sold: boolean
 }
 
 export interface GameState {
