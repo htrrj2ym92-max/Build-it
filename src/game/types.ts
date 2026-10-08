@@ -1,7 +1,7 @@
 export type Resource = 'wood' | 'stone' | 'gold'
 export type Resources = Record<Resource, number>
 export type Material = 'wood' | 'stone'
-export type BuildingType = 'house' | 'lumber' | 'quarry' | 'market' | 'hut' | 'tower' | 'castle'
+export type BuildingType = 'house' | 'lumber' | 'quarry' | 'market' | 'hut' | 'workshop' | 'tower' | 'castle'
 
 export interface MaterialDelivery {
   material: Material
@@ -19,6 +19,8 @@ export interface Cell {
   condition: number
   /** sold to someone else: stays on the lot but no longer owned */
   sold: boolean
+  /** inspection protects the building from its next condition decay */
+  inspected?: boolean
 }
 
 export interface GameState {
@@ -27,6 +29,8 @@ export interface GameState {
   resources: Resources
   deliveries: MaterialDelivery[]
   money: number
+  hiredWorkers?: number
+  efficiencyTrained?: boolean
   grid: Cell[]
   ticks: number
   won: boolean

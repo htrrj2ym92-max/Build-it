@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, EFFICIENCY_TRAINING_COST, LEVELS, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
-import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost } from './game/logic'
+import { build, builders, busyBuilders, canBuild, demolish, gather, goalProgress, hasWorkshop, hireWorkers, income, inspect, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, trainEfficiency, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -27,6 +27,7 @@ export default function App() {
   const rent = rentalIncome(game)
   const goals = goalProgress(game)
   const free = builders(game) - busyBuilders(game)
+  const workshopBuilt = hasWorkshop(game)
   const gameDay = Math.floor(game.ticks / TICKS_PER_DAY) + 1
   const gameHour = Math.floor((game.ticks % TICKS_PER_DAY) * 24 / TICKS_PER_DAY)
 
@@ -169,16 +170,42 @@ export default function App() {
             <small>Delivery takes {MATERIAL_DELIVERY_TIME} seconds.</small>
           </div>
           <div className="panel">
+            <h2>Workers</h2>
+            <small className="hint">Hire workers for parallel construction. A Workshop halves hiring costs.</small>
+            <div className="tools">
+              {WORKER_HIRE_COSTS.map((_, index) => {
+                const workers = index + 1
+                const cost = workerHireCost(game, workers)
+                return (
+                  <button key={workers} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => hireWorkers(g, workers))}>
+                    <b>Hire {workers} worker{workers === 1 ? '' : 's'}</b>
+                    <small>${cost.toLocaleString()}</small>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          {workshopBuilt && (
+            <div className="panel training-panel">
+              <h2>Workshop training</h2>
+              <button className="tool" disabled={game.efficiencyTrained || game.money < EFFICIENCY_TRAINING_COST} onClick={() => setGame(trainEfficiency)}>
+                <b>⚙️ Efficiency Training</b>
+                <small>{game.efficiencyTrained ? 'Trained · construction speed doubled' : `$${EFFICIENCY_TRAINING_COST.toLocaleString()} · doubles construction speed`}</small>
+              </button>
+            </div>
+          )}
+          <div className="panel">
             <h2>Buildings guide</h2>
             <small className="hint">Tap an empty lot on the map to build.</small>
             <div className="tools">
               {BUILDING_ORDER.map((t) => {
                 const def = BUILDINGS[t]
                 return (
-                  <div key={t} className={'tool info' + (canAfford(game, t) ? '' : ' poor')} title={def.desc}>
+                  <div key={t} className={'tool info' + (canBuild(game, t) ? '' : ' poor')} title={def.desc}>
                     <b>{def.icon} {def.name}</b>
                     <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.buildTime}s</small>
                     <small>{def.desc}</small>
+                    {t === 'workshop' && builders(game) < 3 && <small>Requires 3 workers ({builders(game)}/3)</small>}
                   </div>
                 )
               })}
@@ -215,6 +242,12 @@ export default function App() {
                   <b>🔧 Maintain</b>
                   <small>{sel.condition >= 100 ? 'In perfect shape' : `$${maintainCost(sel).toLocaleString()}`}</small>
                 </button>
+                {sel.type === 'house' && workshopBuilt && (
+                  <button className="tool" disabled={sel.inspected === true} onClick={() => act(inspect)}>
+                    <b>🔍 Inspect house</b>
+                    <small>{sel.inspected ? 'Protected from next damage check' : 'Prevents the next condition loss'}</small>
+                  </button>
+                )}
                 <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
                   <b>💵 Sell</b>
                   <small>Get ${salePrice(sel).toLocaleString()}</small>
@@ -238,12 +271,13 @@ export default function App() {
             <div className="build-options">
               {BUILDING_ORDER.map((type) => {
                 const def = BUILDINGS[type]
-                const affordable = canAfford(game, type)
+                const affordable = canBuild(game, type)
                 return (
                   <button key={type} className={'tool' + (affordable && free > 0 ? '' : ' poor')} disabled={!affordable || free <= 0} onClick={() => constructAt(type)}>
                     <b>{def.icon} {def.name}</b>
                     <small>${def.cashCost.toLocaleString()} · {costLabel(type)} · {def.buildTime}s</small>
                     <small>{def.desc}</small>
+                    {type === 'workshop' && builders(game) < 3 && <small>Requires 3 workers ({builders(game)}/3)</small>}
                   </button>
                 )
               })}

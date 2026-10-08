@@ -69,6 +69,18 @@ const art: Record<BuildingType, ReactNode> = {
       <path fill="#765035" d="m31 81 20 9v5l-20-9z" />
     </>
   ),
+  workshop: (
+    <>
+      <path fill="#d6a664" stroke="#755137" strokeWidth="2" strokeLinejoin="round" d="m25 49 39-17 33 17v35L64 101 25 83Z" />
+      <path fill="#bd8249" stroke="#755137" strokeWidth="2" strokeLinejoin="round" d="m64 32 33 17v35L64 101Z" />
+      <path fill="#855441" stroke="#60402f" strokeWidth="2" strokeLinejoin="round" d="m19 49 44-26 40 24-8 11-31-18-34 20Z" />
+      <path fill="#ead39a" stroke="#755137" strokeWidth="2" d="m34 58 27-12v34L34 94Z" />
+      <path fill="#e5bf78" stroke="#755137" strokeWidth="2" d="m68 60 19-9v24l-19 9Z" />
+      <path fill="#724c35" d="M45 85 58 79v17l-13 6Z" />
+      <path fill="#a8dce1" stroke="#755137" strokeWidth="2" d="m74 54 10-5v12l-10 5Z" />
+      <path stroke="#f7e4b6" strokeWidth="3" strokeLinecap="round" d="m47 57 11-5m-8 10 11-5" />
+    </>
+  ),
   tower: (
     <>
       <path fill="#b9bec0" stroke="#606b70" strokeWidth="2" strokeLinejoin="round" d="m36 41 28-12 30 15v44L64 101 36 86Z" />
@@ -109,6 +121,7 @@ export default function BuildingArt({ type, progress = 1, level = 0 }: { type: B
     quarry: '#9aa39d',
     market: '#d7c69d',
     hut: '#bda47c',
+    workshop: '#bd9a6e',
     tower: '#aeb8b5',
     castle: '#aeb8b5',
   }
