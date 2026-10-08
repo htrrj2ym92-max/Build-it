@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS } from './game/data'
 import BuildingArt from './game/BuildingArt'
-import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, newGame, nextLevel, tick } from './game/logic'
+import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, newGame, nextLevel, rentalIncome, tick } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -11,17 +11,23 @@ export default function App() {
   const [game, setGame] = useState<GameState>(loadGame)
   const [tool, setTool] = useState<Tool>('build')
   const [selectedLot, setSelectedLot] = useState<number | null>(null)
+  const [paused, setPaused] = useState(false)
 
   useEffect(() => {
-    const id = setInterval(() => setGame(tick), 1000)
+    const id = setInterval(() => {
+      if (!paused) setGame(tick)
+    }, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [paused])
   useEffect(() => saveGame(game), [game])
 
   const size = Math.sqrt(game.grid.length)
   const inc = income(game)
+  const rent = rentalIncome(game)
   const goals = goalProgress(game)
   const free = builders(game) - busyBuilders(game)
+  const gameDay = Math.floor(game.ticks / 60) + 1
+  const gameHour = Math.floor((game.ticks % 60) * 24 / 60)
 
   const onCell = (i: number) => {
     if (tool === 'demolish') {
@@ -59,6 +65,12 @@ export default function App() {
       </header>
 
       <div className="stats">
+        <span className="money">💵 ${Math.floor(game.money).toLocaleString()}</span>
+        <span className="rent">🏠 ${rent.toLocaleString()}/day rent</span>
+        <span>🕒 Day {gameDay}, {String(gameHour).padStart(2, '0')}:00</span>
+        <button className="pause" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
+          {paused ? '▶ Resume' : '⏸ Pause'}
+        </button>
         <span>🪵 {Math.floor(game.resources.wood)} <small>+{inc.wood}/s</small></span>
         <span>🪨 {Math.floor(game.resources.stone)} <small>+{inc.stone}/s</small></span>
         <span>💰 {Math.floor(game.resources.gold)} <small>+{inc.gold}/s</small></span>
@@ -112,7 +124,7 @@ export default function App() {
                 return (
                   <div key={t} className={'tool' + (canAfford(game.resources, t) ? '' : ' poor')} title={def.desc}>
                     <b>{def.icon} {def.name}</b>
-                    <small>{costLabel(t)} · {def.buildTime}s</small>
+                    <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.buildTime}s</small>
                     <small>{def.desc}</small>
                   </div>
                 )
@@ -145,11 +157,11 @@ export default function App() {
             <div className="build-options">
               {BUILDING_ORDER.map((type) => {
                 const def = BUILDINGS[type]
-                const affordable = canAfford(game.resources, type)
+                const affordable = canAfford(game, type)
                 return (
                   <button key={type} className={'tool' + (affordable && free > 0 ? '' : ' poor')} disabled={!affordable || free <= 0} onClick={() => constructAt(type)}>
                     <b>{def.icon} {def.name}</b>
-                    <small>{costLabel(type)} · {def.buildTime}s</small>
+                    <small>${def.cashCost.toLocaleString()} · {costLabel(type)} · {def.buildTime}s</small>
                     <small>{def.desc}</small>
                   </button>
                 )
