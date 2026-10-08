@@ -84,3 +84,7 @@ header button { background: #6b7d5f; }
   .modal, .build-modal { width: 100%; max-width: 100%; border-radius: 18px 18px 12px 12px; }
   .board { transform: none; }
 }
+.cell svg.lot-art { position: absolute; inset: 0; width: 100%; height: 100%; transform: none; animation: none; filter: none; z-index: 0; pointer-events: none; }
+.cell svg:not(.lot-art) { position: relative; z-index: 1; }
+.cell.unowned svg.lot-art { opacity: .85; }
+.cell.sold svg.lot-art { filter: grayscale(1); }
