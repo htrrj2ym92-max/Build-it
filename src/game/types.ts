@@ -1,6 +1,6 @@
 export type Resource = 'wood' | 'stone' | 'gold'
 export type Resources = Record<Resource, number>
-export type BuildingType = 'house' | 'lumber' | 'quarry' | 'market' | 'hut' | 'tower'
+export type BuildingType = 'house' | 'lumber' | 'quarry' | 'market' | 'hut' | 'tower' | 'castle'
 
 export interface Cell {
   type: BuildingType | null
