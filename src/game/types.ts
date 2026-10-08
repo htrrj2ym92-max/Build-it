@@ -12,6 +12,7 @@ export interface GameState {
   version: number
   level: number
   resources: Resources
+  money: number
   grid: Cell[]
   ticks: number
   won: boolean
