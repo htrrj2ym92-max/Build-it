@@ -1,0 +1,24 @@
+:root { color-scheme: light; font-family: system-ui, -apple-system, sans-serif; --bg:#e8f1da; --ink:#2b3a1f; --card:#fff; --accent:#4a7c2a; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.app { max-width: 1000px; margin: 0 auto; padding: max(8px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+header { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+h1 { font-size: 1.4rem; margin: 6px 0; } h2 { font-size: 1rem; margin: 0 0 6px; }
+button { font: inherit; cursor: pointer; border: 0; border-radius: 8px; padding: 8px 12px; background: var(--accent); color: #fff; min-height: 44px; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px 14px; background: var(--card); padding: 8px 12px; border-radius: 10px; font-weight: 600; margin-bottom: 10px; }
+.stats small { color: #667; font-weight: 400; }
+main { display: grid; gap: 10px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { main { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; } }
+.board { display: grid; gap: 4px; background: #8bb35a; padding: 6px; border-radius: 12px; width: 100%; max-width: min(100%, 70vh); margin: 0 auto; }
+.cell { position: relative; aspect-ratio: 1; padding: 0; font-size: clamp(1.2rem, 6vw, 2.4rem); background: #a9cf78; color: inherit; min-height: 0; }
+.cell.built { background: #f6ecd0; } .cell.building { background: #d8c9a0; opacity: .85; }
+.timer { position: absolute; bottom: 2px; right: 4px; font-size: .7rem; }
+.panel { background: var(--card); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+ul { margin: 0; padding-left: 18px; } li.done { color: var(--accent); text-decoration: line-through; }
+.tools { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
+.tool { display: flex; flex-direction: column; align-items: flex-start; text-align: left; background: #eef3e6; color: var(--ink); gap: 2px; border: 2px solid transparent; }
+.tool.active { border-color: var(--accent); } .tool.poor { opacity: .55; }
+.tool small { font-size: .7rem; }
+.gather { width: 100%; margin-top: 8px; background: #8a5a2b; }
+.overlay { position: fixed; inset: 0; background: #0008; display: grid; place-items: center; padding: 16px; }
+.modal { background: #fff; border-radius: 14px; padding: 20px; text-align: center; max-width: 340px; }
