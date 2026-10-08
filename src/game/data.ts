@@ -41,4 +41,7 @@ export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
 export const HOUSE_RENT_PER_DAY = 800
 export const TICKS_PER_DAY = 60
+export const MATERIAL_ORDER_AMOUNT = 10
+export const MATERIAL_DELIVERY_TIME = 10
+export const MATERIAL_ORDER_COST = { wood: 1000, stone: 1500 } as const
 export const SAVE_KEY = 'build-it-save-v1'

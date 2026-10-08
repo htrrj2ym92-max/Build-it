@@ -1,6 +1,13 @@
 export type Resource = 'wood' | 'stone' | 'gold'
 export type Resources = Record<Resource, number>
+export type Material = 'wood' | 'stone'
 export type BuildingType = 'house' | 'lumber' | 'quarry' | 'market' | 'hut' | 'tower' | 'castle'
+
+export interface MaterialDelivery {
+  material: Material
+  quantity: number
+  remaining: number
+}
 
 export interface Cell {
   type: BuildingType | null
@@ -18,6 +25,7 @@ export interface GameState {
   version: number
   level: number
   resources: Resources
+  deliveries: MaterialDelivery[]
   money: number
   grid: Cell[]
   ticks: number

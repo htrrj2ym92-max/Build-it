@@ -10,6 +10,7 @@ export function loadGame(): GameState {
       if (isValid(parsed)) return {
         ...parsed,
         money: parsed.money ?? STARTING_MONEY,
+        deliveries: parsed.deliveries ?? [],
         grid: parsed.grid.map((c) => ({ ...c, level: c.level ?? 0, condition: c.condition ?? 100, sold: c.sold === true })),
       }
     }
