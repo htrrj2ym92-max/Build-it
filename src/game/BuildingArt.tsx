@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import type { BuildingType } from './types'
 
 const art: Record<BuildingType, ReactNode> = {
@@ -84,16 +84,57 @@ const art: Record<BuildingType, ReactNode> = {
       <path fill="#e9c56c" d="m61 75 3-5 3 5v7h-6Z" />
     </>
   ),
+  castle: (
+    <>
+      <path fill="#c7c7bb" stroke="#5d6262" strokeWidth="2" strokeLinejoin="round" d="m22 53 42-22 40 22v35L64 108 22 86Z" />
+      <path fill="#a3aaa5" stroke="#5d6262" strokeWidth="2" strokeLinejoin="round" d="m64 31 40 22v35L64 108Z" />
+      <path fill="#d6d4c7" stroke="#5d6262" strokeWidth="2" d="M29 54V36l8 4V29l9 5V24l10 5v17Zm37-19V20l9 4V15l9 5V11l10 6v25Z" />
+      <path fill="#b7bdb7" stroke="#5d6262" strokeWidth="2" d="M64 46V32l8 4V25l9 5V21l9 5v23Z" />
+      <path fill="#9d554d" stroke="#62433d" strokeWidth="2" strokeLinejoin="round" d="m24 39 18-23 19 23-8 8-11-13-11 15Zm37-1 20-29 22 31-9 9-13-18-12 18Z" />
+      <path fill="#bd6b5b" stroke="#62433d" strokeWidth="2" strokeLinejoin="round" d="m61 38 20-29 22 31-9 9-13-18-12 18Z" />
+      <path fill="#57483e" stroke="#423a33" strokeWidth="2" d="M54 77a10 10 0 0 1 20 0v27l-20 10Z" />
+      <path fill="#f1d27d" stroke="#5d6262" strokeWidth="2" d="M34 61h9v14h-9zm48 0h9v14h-9zM58 49h9v13h-9z" />
+      <path fill="#768e89" stroke="#5d6262" strokeWidth="2" d="M72 54h8v13h-8z" />
+      <path fill="#e1c173" d="M61 80h5v2h-5z" />
+    </>
+  ),
 }
 
-export default function BuildingArt({ type }: { type: BuildingType }) {
+export default function BuildingArt({ type, progress = 1 }: { type: BuildingType; progress?: number }) {
+  const clipId = useId().replace(/:/g, '')
+  const reveal = progress >= 1 ? 1 : progress < 0.25 ? 0 : progress < 0.55 ? 0.52 : 0.88
+  const foundationColors: Record<BuildingType, string> = {
+    house: '#d8b982',
+    lumber: '#bd8c5b',
+    quarry: '#9aa39d',
+    market: '#d7c69d',
+    hut: '#bda47c',
+    tower: '#aeb8b5',
+    castle: '#aeb8b5',
+  }
+
   return (
     <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false">
       <ellipse cx="61" cy="86" rx="49" ry="19" fill="#57834b" opacity=".34" />
       <ellipse cx="59" cy="83" rx="47" ry="18" fill="#a7cf72" />
       <path d="m21 82 8-4m58 11 8-4M45 96l4-4m36-21 5-2" stroke="#e4e99b" strokeWidth="2" strokeLinecap="round" />
       <path d="m17 85 3-2m81-8 3-2M36 97l3-2" stroke="#638b4b" strokeWidth="3" strokeLinecap="round" />
-      {art[type]}
+      {progress < 1 && (
+        <>
+          <path d="m28 80 35-16 34 16-34 18Z" fill={foundationColors[type]} stroke="#655d4d" strokeWidth="2" strokeLinejoin="round" />
+          <path d="m37 81 26-12 26 12-26 13Z" fill="none" stroke="#e9dfc4" strokeWidth="2" />
+        </>
+      )}
+      {reveal > 0 && (
+        <>
+          <defs>
+            <clipPath id={clipId}>
+              <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${clipId})`}>{art[type]}</g>
+        </>
+      )}
       <path d="M22 82c2 0 3 2 2 4-2 2-5 0-4-2m77 8c2 0 3 2 2 4-2 2-5 0-4-2" fill="#f7e794" />
     </svg>
   )
