@@ -100,7 +100,7 @@ const art: Record<BuildingType, ReactNode> = {
   ),
 }
 
-export default function BuildingArt({ type, progress = 1 }: { type: BuildingType; progress?: number }) {
+export default function BuildingArt({ type, progress = 1, level = 0 }: { type: BuildingType; progress?: number; level?: number }) {
   const clipId = useId().replace(/:/g, '')
   const reveal = progress >= 1 ? 1 : progress < 0.25 ? 0 : progress < 0.55 ? 0.52 : 0.88
   const foundationColors: Record<BuildingType, string> = {
@@ -133,6 +133,25 @@ export default function BuildingArt({ type, progress = 1 }: { type: BuildingType
             </clipPath>
           </defs>
           <g clipPath={`url(#${clipId})`}>{art[type]}</g>
+          {progress >= 1 && level >= 1 && (
+            <>
+              <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />
+              <path d="m104 52 12 5-12 5Z" fill="#e0523f" stroke="#6c563d" strokeWidth="1.5" strokeLinejoin="round" />
+            </>
+          )}
+          {progress >= 1 && level >= 2 && (
+            <>
+              <path d="M18 88 61 106 104 88" fill="none" stroke="#f2c230" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="22" cy="70" r="4" fill="#ffd966" stroke="#9a6b12" strokeWidth="1.5" />
+              <circle cx="14" cy="76" r="3" fill="#ffd966" stroke="#9a6b12" strokeWidth="1.5" />
+            </>
+          )}
+          {progress >= 1 && level >= 3 && (
+            <>
+              <ellipse cx="60" cy="58" rx="52" ry="46" fill="none" stroke="#ffd34d" strokeWidth="2" strokeDasharray="4 5" opacity=".9" />
+              <path d="m60 4 4 9 10 1-8 7 3 10-9-6-9 6 3-10-8-7 10-1Z" fill="#ffd34d" stroke="#9a6b12" strokeWidth="1.5" strokeLinejoin="round" />
+            </>
+          )}
         </>
       )}
       <path d="M22 82c2 0 3 2 2 4-2 2-5 0-4-2m77 8c2 0 3 2 2 4-2 2-5 0-4-2" fill="#f7e794" />

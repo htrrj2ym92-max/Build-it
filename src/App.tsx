@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, TICKS_PER_DAY } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, MAX_UPGRADE, TICKS_PER_DAY } from './game/data'
 import BuildingArt from './game/BuildingArt'
-import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, newGame, nextLevel, rentalIncome, tick } from './game/logic'
+import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, isOwned, maintain, maintainCost, newGame, nextLevel, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -11,6 +11,7 @@ export default function App() {
   const [game, setGame] = useState<GameState>(loadGame)
   const [tool, setTool] = useState<Tool>('build')
   const [selectedLot, setSelectedLot] = useState<number | null>(null)
+  const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null)
   const [paused, setPaused] = useState(false)
 
   useEffect(() => {
@@ -34,6 +35,8 @@ export default function App() {
       setGame((g) => demolish(g, i))
     } else if (!game.grid[i]?.type) {
       setSelectedLot(i)
+    } else if (game.grid[i].remaining === 0) {
+      setSelectedBuilding(i)
     }
   }
 
@@ -43,6 +46,14 @@ export default function App() {
     setTool('build')
     setSelectedLot(null)
   }
+
+  const act = (fn: (g: GameState, i: number) => GameState, close = false) => {
+    if (selectedBuilding === null) return
+    setGame((g) => fn(g, selectedBuilding))
+    if (close) setSelectedBuilding(null)
+  }
+
+  const sel = selectedBuilding !== null ? game.grid[selectedBuilding] : null
 
   const costLabel = (type: BuildingType) =>
     Object.entries(BUILDINGS[type].cost)
@@ -82,16 +93,18 @@ export default function App() {
           {game.grid.map((c, i) => (
             <button
               key={i}
-              className={'cell' + (c.type ? (c.remaining ? ' building' : ' built') : '')}
+              className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : '')}
               onClick={() => onCell(i)}
-              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : ''}` : 'Empty plot'}
+              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : 'Empty plot'}
             >
               {c.type && (
                 <BuildingArt
                   type={c.type}
+                  level={c.level}
                   progress={c.remaining > 0 ? (BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime : 1}
                 />
               )}
+              {c.sold && <span className="timer sold-tag">Sold</span>}
               {c.type && c.remaining > 0 && (
                 <span className="timer">
                   {(BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime < 0.25
@@ -145,6 +158,39 @@ export default function App() {
             <h2>🎉 Level {game.level + 1} complete!</h2>
             <p>{game.level + 1 >= LEVELS.length ? 'You have mastered the town. Keep going in bonus levels!' : 'The town grows bigger.'}</p>
             <button onClick={() => setGame(nextLevel)}>Next level</button>
+          </div>
+        </div>
+      )}
+
+      {sel?.type && (
+        <div className="overlay" onClick={() => setSelectedBuilding(null)}>
+          <div className="modal build-modal" role="dialog" aria-modal="true" aria-labelledby="manage-title" onClick={(event) => event.stopPropagation()}>
+            <h2 id="manage-title">{BUILDINGS[sel.type].icon} {BUILDINGS[sel.type].name}</h2>
+            <div className="manage-art"><BuildingArt type={sel.type} level={sel.level} /></div>
+            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.sold ? ' · Sold' : ''}</p>
+            {sel.sold ? (
+              <p>This property was sold and no longer earns you income.</p>
+            ) : (
+              <div className="build-options">
+                <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.money < upgradeCost(sel)} onClick={() => act(upgrade)}>
+                  <b>⬆️ Upgrade</b>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `$${upgradeCost(sel).toLocaleString()}`}</small>
+                </button>
+                <button className="tool" disabled={sel.condition >= 100 || game.money < maintainCost(sel)} onClick={() => act(maintain)}>
+                  <b>🔧 Maintain</b>
+                  <small>{sel.condition >= 100 ? 'In perfect shape' : `$${maintainCost(sel).toLocaleString()}`}</small>
+                </button>
+                <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
+                  <b>💵 Sell</b>
+                  <small>Get ${salePrice(sel).toLocaleString()}</small>
+                </button>
+                <button className="tool" onClick={() => act(demolish, true)}>
+                  <b>💥 Demolish</b>
+                  <small>Refunds 50% of base cost</small>
+                </button>
+              </div>
+            )}
+            <button className="cancel-build" onClick={() => setSelectedBuilding(null)}>Close</button>
           </div>
         </div>
       )}
