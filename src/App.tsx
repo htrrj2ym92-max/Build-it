@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, MAX_UPGRADE, TICKS_PER_DAY } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY } from './game/data'
 import BuildingArt from './game/BuildingArt'
-import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, isOwned, maintain, maintainCost, newGame, nextLevel, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost } from './game/logic'
+import { build, builders, busyBuilders, canAfford, demolish, gather, goalProgress, income, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -128,6 +128,38 @@ export default function App() {
                 </li>
               ))}
             </ul>
+          </div>
+          <div className="panel materials-panel">
+            <h2>Construction materials</h2>
+            <div className="material-inventory">
+              <span>🪵 Wood <b>{Math.floor(game.resources.wood)}</b></span>
+              <span>🪨 Stone <b>{Math.floor(game.resources.stone)}</b></span>
+            </div>
+            <div className="tools">
+              {(['wood', 'stone'] as const).map((material) => (
+                <button
+                  key={material}
+                  className="tool"
+                  disabled={game.money < MATERIAL_ORDER_COST[material]}
+                  onClick={() => setGame((g) => orderMaterials(g, material))}
+                >
+                  <b>Order {material}</b>
+                  <small>+{MATERIAL_ORDER_AMOUNT} · ${MATERIAL_ORDER_COST[material].toLocaleString()}</small>
+                </button>
+              ))}
+            </div>
+            {game.deliveries.length > 0 ? (
+              <ul className="deliveries" aria-label="Incoming material deliveries">
+                {game.deliveries.map((delivery, index) => (
+                  <li key={`${delivery.material}-${index}`}>
+                    {delivery.material === 'wood' ? '🪵' : '🪨'} {delivery.quantity} {delivery.material} · arrives in {delivery.remaining}s
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <small className="no-deliveries">No deliveries in transit</small>
+            )}
+            <small>Delivery takes {MATERIAL_DELIVERY_TIME} seconds.</small>
           </div>
           <div className="panel">
             <h2>Build</h2>

@@ -1,5 +1,5 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, HOUSE_RENT_PER_DAY, LEVELS, MAX_UPGRADE, STARTING_MONEY, TICKS_PER_DAY } from './data'
-import type { BuildingType, Cell, GameState, Resource, Resources } from './types'
+import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, HOUSE_RENT_PER_DAY, LEVELS, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, STARTING_MONEY, TICKS_PER_DAY } from './data'
+import type { BuildingType, Cell, GameState, Material, Resource, Resources } from './types'
 
 const RES: Resource[] = ['wood', 'stone', 'gold']
 
@@ -14,6 +14,7 @@ export const newGame = (level = 0): GameState => ({
   version: 1,
   level,
   resources: { wood: 50, stone: 20, gold: 20 },
+  deliveries: [],
   money: STARTING_MONEY,
   grid: Array.from({ length: levelDef(level).size ** 2 }, () => emptyCell()),
   ticks: 0,
@@ -94,6 +95,20 @@ export const gather = (g: GameState): GameState => ({
   resources: { ...g.resources, wood: g.resources.wood + GATHER_AMOUNT },
 })
 
+export function orderMaterials(g: GameState, material: Material): GameState {
+  const cost = MATERIAL_ORDER_COST[material]
+  if (g.money < cost) return g
+  return {
+    ...g,
+    money: g.money - cost,
+    deliveries: [...g.deliveries, {
+      material,
+      quantity: MATERIAL_ORDER_AMOUNT,
+      remaining: MATERIAL_DELIVERY_TIME,
+    }],
+  }
+}
+
 export function income(g: GameState): Resources {
   const r: Resources = { wood: 0, stone: 0, gold: 0 }
   g.grid.forEach((c) => {
@@ -124,6 +139,11 @@ export function tick(g: GameState): GameState {
   RES.forEach((k) => (resources[k] += inc[k]))
   const ticks = g.ticks + 1
   const decay = ticks % CONDITION_DECAY_TICKS === 0
+  const deliveries = g.deliveries.filter((delivery) => delivery.remaining > 1)
+    .map((delivery) => ({ ...delivery, remaining: delivery.remaining - 1 }))
+  g.deliveries.forEach((delivery) => {
+    if (delivery.remaining <= 1) resources[delivery.material] += delivery.quantity
+  })
   const grid: Cell[] = g.grid.map((c) =>
     c.type && c.remaining > 0
       ? { ...c, remaining: c.remaining - 1 }
@@ -131,7 +151,7 @@ export function tick(g: GameState): GameState {
         ? { ...c, condition: c.condition - 1 }
         : c)
   const rent = ticks % TICKS_PER_DAY === 0 ? rentalIncome({ ...g, grid }) : 0
-  const next = { ...g, resources, money: g.money + rent, grid, ticks }
+  const next = { ...g, resources, deliveries, money: g.money + rent, grid, ticks }
   return { ...next, won: goalProgress(next).every((i) => i.have >= i.need) }
 }
 
@@ -143,6 +163,10 @@ export function isValid(s: unknown): s is GameState {
     !!g && g.version === 1 && typeof g.level === 'number' && g.level >= 0 &&
     Array.isArray(g.grid) && g.grid.length === levelDef(g.level).size ** 2 &&
     !!g.resources && RES.every((k) => typeof g.resources[k] === 'number') &&
+    (g.deliveries === undefined || (Array.isArray(g.deliveries) && g.deliveries.every((delivery) =>
+      delivery && (delivery.material === 'wood' || delivery.material === 'stone') &&
+      Number.isInteger(delivery.quantity) && delivery.quantity > 0 &&
+      Number.isInteger(delivery.remaining) && delivery.remaining > 0))) &&
     (g.money === undefined || (typeof g.money === 'number' && Number.isFinite(g.money) && g.money >= 0)) &&
     g.grid.every((c) => c && (c.type === null || c.type in BUILDINGS) && typeof c.remaining === 'number' &&
       (c.level === undefined || (Number.isInteger(c.level) && c.level >= 0 && c.level <= MAX_UPGRADE)) &&
