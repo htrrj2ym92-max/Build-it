@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, EFFICIENCY_TRAINING_COST, LEVELS, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
-import { build, builders, busyBuilders, canAfford, canBuild, demolish, gather, goalProgress, hasWorkshop, hireWorkers, income, inspect, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, trainEfficiency, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { build, builders, busyBuilders, canBuild, demolish, gather, goalProgress, hasWorkshop, hireWorkers, income, inspect, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, trainEfficiency, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -185,6 +185,15 @@ export default function App() {
               })}
             </div>
           </div>
+          {workshopBuilt && (
+            <div className="panel training-panel">
+              <h2>Workshop training</h2>
+              <button className="tool" disabled={game.efficiencyTrained || game.money < EFFICIENCY_TRAINING_COST} onClick={() => setGame(trainEfficiency)}>
+                <b>⚙️ Efficiency Training</b>
+                <small>{game.efficiencyTrained ? 'Trained · construction speed doubled' : `$${EFFICIENCY_TRAINING_COST.toLocaleString()} · doubles construction speed`}</small>
+              </button>
+            </div>
+          )}
           <div className="panel">
             <h2>Buildings guide</h2>
             <small className="hint">Tap an empty lot on the map to build.</small>
@@ -275,15 +284,6 @@ export default function App() {
             </div>
             <button className="cancel-build" onClick={() => setSelectedLot(null)}>Cancel</button>
           </div>
-        </div>
-      )}
-      {workshopBuilt && (
-        <div className="panel training-panel">
-          <h2>Workshop training</h2>
-          <button className="tool" disabled={game.efficiencyTrained || game.money < EFFICIENCY_TRAINING_COST} onClick={() => setGame(trainEfficiency)}>
-            <b>⚙️ Efficiency Training</b>
-            <small>{game.efficiencyTrained ? 'Trained · construction speed doubled' : `$${EFFICIENCY_TRAINING_COST.toLocaleString()} · doubles construction speed`}</small>
-          </button>
         </div>
       )}
     </div>
