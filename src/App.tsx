@@ -153,9 +153,8 @@ export default function App() {
           <button className="dock-btn" onClick={() => setPaused((value) => !value)} aria-pressed={paused}><span>{paused ? '▶' : '⏸'}</span>{paused ? 'Resume' : 'Pause'}</button>
         </div>
         {trackedDelivery && (
-          <div className="delivery-tracker" role="progressbar" aria-label={`Delivery truck: ${trackedDelivery.quantity} materials arriving in ${trackedDelivery.remaining} seconds`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(deliveryProgress)}>
-            <span className="delivery-truck" style={{ background: `linear-gradient(to top, #8abd58 ${deliveryProgress}%, #e7f2bd ${deliveryProgress}%)` }}>🚚</span>
-            <span>Next delivery · {trackedDelivery.remaining}s</span>
+          <div className="delivery-tracker" role="progressbar" aria-label={`Delivery of ${trackedDelivery.quantity} materials`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(deliveryProgress)}>
+            <span className="delivery-progress-fill" style={{ width: `${deliveryProgress}%` }} />
           </div>
         )}
         </div>
@@ -180,7 +179,7 @@ export default function App() {
                 return (
                   <button key={order.quantity} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => orderMaterials(g, order))}>
                     <b>Order {order.quantity.toLocaleString()}</b>
-                    <small>${cost.toLocaleString()} · ${Math.round(cost / order.quantity).toLocaleString()} per material · {materialDeliveryTime(game, order)}s</small>
+                    <small>${cost.toLocaleString()} · ${Math.round(cost / order.quantity).toLocaleString()} per material</small>
                   </button>
                 )
               })}
@@ -199,14 +198,14 @@ export default function App() {
               <ul className="deliveries" aria-label="Incoming material deliveries">
                 {game.deliveries.map((delivery, index) => (
                   <li key={index}>
-                    🧱 {delivery.quantity} materials · arrives in {delivery.remaining}s
+                    🧱 {delivery.quantity} materials
                   </li>
                 ))}
               </ul>
             ) : (
               <small className="no-deliveries">No deliveries in transit</small>
             )}
-            <small>Delivery time depends on order size{game.sawmillBuilt ? ' and is halved with the sawmill' : ''}.</small>
+            <small>Delivery progress is shown while materials are in transit.</small>
           </div>
           <div className="panel">
             <h2>Workers</h2>
