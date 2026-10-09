@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, materialDeliveryTime, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
