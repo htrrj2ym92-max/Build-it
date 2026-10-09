@@ -13,12 +13,12 @@ export interface BuildingDef {
 }
 
 export const BUILDINGS: Record<BuildingType, BuildingDef> = {
-  rambler: { name: 'Rambler', icon: '🏠', cost: 75, cashCost: 50000, workers: 1, rentPerDay: 1000, buildTime: 3, upgradeTime: 3, desc: 'Entry-level home · $1,000/day rent' },
-  colonial: { name: 'Colonial', icon: '🏡', cost: 150, cashCost: 75000, workers: 2, rentPerDay: 1500, buildTime: 4, upgradeTime: 3, desc: 'Modest mid-tier home · $1,500/day rent' },
-  tudor: { name: 'Tudor', icon: '🏘️', cost: 300, cashCost: 150000, workers: 3, rentPerDay: 3000, buildTime: 6, upgradeTime: 4, desc: 'Stylish family home · $3,000/day rent' },
-  estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 240000, workers: 5, rentPerDay: 6000, buildTime: 8, upgradeTime: 4, desc: 'High-value upscale residence · $6,000/day rent' },
-  mansion: { name: 'Mansion', icon: '🏰', cost: 1200, cashCost: 600000, workers: 7, rentPerDay: 15000, buildTime: 10, upgradeTime: 5, desc: 'Luxury premium property · $15,000/day rent' },
-  castle: { name: 'Castle', icon: '🏯', cost: 2500, cashCost: 1200000, workers: 9, rentPerDay: 25000, buildTime: 14, upgradeTime: 6, desc: 'Ultimate high-rent property · $25,000/day rent' },
+  rambler: { name: 'Rambler', icon: '🏠', cost: 75, cashCost: 50000, workers: 1, rentPerDay: 1000, buildTime: 10, upgradeTime: 5, desc: 'Entry-level home · $1,000/day rent' },
+  colonial: { name: 'Colonial', icon: '🏡', cost: 150, cashCost: 75000, workers: 2, rentPerDay: 1500, buildTime: 12, upgradeTime: 6, desc: 'Modest mid-tier home · $1,500/day rent' },
+  tudor: { name: 'Tudor', icon: '🏘️', cost: 300, cashCost: 150000, workers: 3, rentPerDay: 3000, buildTime: 14, upgradeTime: 7, desc: 'Stylish family home · $3,000/day rent' },
+  estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 240000, workers: 5, rentPerDay: 6000, buildTime: 16, upgradeTime: 8, desc: 'High-value upscale residence · $6,000/day rent' },
+  mansion: { name: 'Mansion', icon: '🏰', cost: 1200, cashCost: 600000, workers: 7, rentPerDay: 15000, buildTime: 18, upgradeTime: 9, desc: 'Luxury premium property · $15,000/day rent' },
+  castle: { name: 'Castle', icon: '🏯', cost: 2500, cashCost: 1200000, workers: 9, rentPerDay: 25000, buildTime: 20, upgradeTime: 10, desc: 'Ultimate high-rent property · $25,000/day rent' },
 }
 
 export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', 'estate', 'mansion', 'castle']
