@@ -14,7 +14,7 @@ export function loadGame(): GameState {
           ...delivery,
           duration: delivery.duration ?? MATERIAL_DELIVERY_TIME,
         })),
-        grid: parsed.grid.map((c) => ({ ...c, lotOwned: c.lotOwned === true, level: c.level ?? 0, condition: c.condition ?? 100, sold: c.sold === true })),
+        grid: parsed.grid.map((c) => ({ ...c, lotOwned: c.lotOwned === true, level: c.level ?? 0, condition: c.condition ?? 100, painted: c.painted === true, landscaped: c.landscaped === true, sold: c.sold === true })),
         hiredWorkers: parsed.hiredWorkers ?? 0,
         sawmillBuilt: parsed.sawmillBuilt ?? false,
       }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, landscape, maintain, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -252,14 +252,22 @@ export default function App() {
           <div className="modal build-modal" role="dialog" aria-modal="true" aria-labelledby="manage-title" onClick={(event) => event.stopPropagation()}>
             <h2 id="manage-title">{BUILDINGS[sel.type].icon} {BUILDINGS[sel.type].name}</h2>
             <div className="manage-art"><BuildingArt type={sel.type} level={sel.level} /></div>
-            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.sold ? ' · Sold' : ''}</p>
+            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.painted ? ' · Painted' : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
             {sel.sold ? (
               <p>This property was sold and no longer earns you income.</p>
             ) : (
               <div className="build-options">
                 <button className="tool" disabled={sel.level >= MAX_UPGRADE} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
-                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : 'No cash cost'}</small>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : '+10% value · No cash cost'}</small>
+                </button>
+                <button className="tool" disabled={sel.painted} onClick={() => act(paintBuilding)}>
+                  <b>🎨 Paint</b>
+                  <small>{sel.painted ? 'Already painted' : '+5% value · No cash cost'}</small>
+                </button>
+                <button className="tool" disabled={sel.landscaped} onClick={() => act(landscape)}>
+                  <b>🌿 Landscape</b>
+                  <small>{sel.landscaped ? 'Already landscaped' : '+5% value · No cash cost'}</small>
                 </button>
                 <button className="tool" disabled={sel.condition >= 100} onClick={() => act(maintain)}>
                   <b>🔧 Maintain</b>
