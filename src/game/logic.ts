@@ -63,12 +63,6 @@ export function demolish(g: GameState, index: number): GameState {
   return { ...g, resources, grid }
 }
 
-export const upgradeCost = (cell: Cell) =>
-  cell.type ? Math.round(BUILDINGS[cell.type].cashCost * 0.5 * (cell.level + 1)) : 0
-
-export const maintainCost = (cell: Cell) =>
-  cell.type ? Math.round(BUILDINGS[cell.type].cashCost * 0.05 * (1 + cell.level)) : 0
-
 export const salePrice = (cell: Cell) => {
   if (!cell.type) return 0
   let value = BUILDINGS[cell.type].cashCost
@@ -76,22 +70,22 @@ export const salePrice = (cell: Cell) => {
   return Math.floor(value * 0.7 * (0.5 + 0.5 * cell.condition / 100))
 }
 
-const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, cost = 0, gain = 0): GameState => {
+const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, gain = 0): GameState => {
   const grid = g.grid.slice()
   grid[index] = fn(grid[index])
-  return { ...g, grid, money: g.money - cost + gain }
+  return { ...g, grid, money: g.money + gain }
 }
 
 export function upgrade(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell || !isOwned(cell) || cell.level >= MAX_UPGRADE || g.money < upgradeCost(cell)) return g
-  return updateCell(g, index, (c) => ({ ...c, level: c.level + 1 }), upgradeCost(cell))
+  if (!cell || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
+  return updateCell(g, index, (c) => ({ ...c, level: c.level + 1 }))
 }
 
 export function maintain(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell || !isOwned(cell) || cell.condition >= 100 || g.money < maintainCost(cell)) return g
-  return updateCell(g, index, (c) => ({ ...c, condition: 100 }), maintainCost(cell))
+  if (!cell || !isOwned(cell) || cell.condition >= 100) return g
+  return updateCell(g, index, (c) => ({ ...c, condition: 100 }))
 }
 
 export const workerHireCost = (workers: number) => {
@@ -113,7 +107,7 @@ export function buildSawmill(g: GameState): GameState {
 export function sell(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell || !isOwned(cell)) return g
-  return updateCell(g, index, (c) => ({ ...c, sold: true }), 0, salePrice(cell))
+  return updateCell(g, index, (c) => ({ ...c, sold: true }), salePrice(cell))
 }
 
 export const gather = (g: GameState): GameState => ({

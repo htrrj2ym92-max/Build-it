@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, maintainCost, materialDeliveryTime, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, materialDeliveryTime, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -237,13 +237,13 @@ export default function App() {
               <p>This property was sold and no longer earns you income.</p>
             ) : (
               <div className="build-options">
-                <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.money < upgradeCost(sel)} onClick={() => act(upgrade)}>
+                <button className="tool" disabled={sel.level >= MAX_UPGRADE} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
-                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `$${upgradeCost(sel).toLocaleString()}`}</small>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : 'No cash cost'}</small>
                 </button>
-                <button className="tool" disabled={sel.condition >= 100 || game.money < maintainCost(sel)} onClick={() => act(maintain)}>
+                <button className="tool" disabled={sel.condition >= 100} onClick={() => act(maintain)}>
                   <b>🔧 Maintain</b>
-                  <small>{sel.condition >= 100 ? 'In perfect shape' : `$${maintainCost(sel).toLocaleString()}`}</small>
+                  <small>{sel.condition >= 100 ? 'In perfect shape' : 'No cash cost'}</small>
                 </button>
                 <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
                   <b>💵 Sell</b>
