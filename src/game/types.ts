@@ -5,6 +5,7 @@ export type BuildingType = 'rambler' | 'colonial' | 'tudor' | 'estate' | 'mansio
 export interface MaterialDelivery {
   quantity: number
   remaining: number
+  duration?: number
 }
 
 export interface Cell {
@@ -26,6 +27,7 @@ export interface GameState {
   resources: Resources
   deliveries: MaterialDelivery[]
   money: number
+  sawmillBuilt?: boolean
   hiredWorkers?: number
   grid: Cell[]
   ticks: number

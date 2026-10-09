@@ -72,6 +72,11 @@ header button { background: #6b7d5f; }
 .dock-btn.materials { background: linear-gradient(#7e9a6a,#5d7949); border-bottom-color: #405633; }
 .dock-btn.danger { background: linear-gradient(#d9694f,#b44a35); border-bottom-color: #7e2f21; }
 .dock-btn.active { outline: 3px solid #f6d77a; }
+.delivery-tracker { display: flex; align-items: center; justify-content: center; gap: 10px; width: min(100%, 70vh); margin: 8px auto 0; padding: 6px 10px; border-radius: 12px; background: #fff; box-shadow: 0 2px 6px #344b2b22; font-weight: 700; }
+.delivery-truck { display: grid; place-items: center; width: 42px; height: 42px; border: 2px solid #668b48; border-radius: 10px; font-size: 1.5rem; }
+.sawmill-option { margin-top: 8px; }
+.sawmill-option .tool { width: 100%; }
+.sawmill-option > small { display: block; color: #315b20; font-weight: 700; }
 .panel { border: 2px solid #f6f4d8; border-radius: 14px; }
 .panel h2 { color: #3f6b2a; }
 .tool { min-height: 52px; border-radius: 12px; }

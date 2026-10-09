@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { build, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, maintainCost, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, maintainCost, materialDeliveryTime, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -29,6 +29,12 @@ export default function App() {
   const free = builders(game) - busyBuilders(game)
   const gameDay = Math.floor(game.ticks / TICKS_PER_DAY) + 1
   const gameHour = Math.floor((game.ticks % TICKS_PER_DAY) * 24 / TICKS_PER_DAY)
+  const trackedDelivery = game.deliveries.reduce((soonest, delivery) =>
+    !soonest || delivery.remaining < soonest.remaining ? delivery : soonest, undefined as GameState['deliveries'][number] | undefined)
+  const deliveryDuration = trackedDelivery?.duration ?? MATERIAL_DELIVERY_TIME
+  const deliveryProgress = trackedDelivery
+    ? Math.min(100, Math.max(0, (deliveryDuration - trackedDelivery.remaining) / deliveryDuration * 100))
+    : 0
 
   const onCell = (i: number) => {
     if (tool === 'demolish') {
@@ -120,6 +126,12 @@ export default function App() {
           <button className={'dock-btn danger' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}><span>💥</span>{tool === 'demolish' ? 'Tap building' : 'Demolish'}</button>
           <button className="dock-btn" onClick={() => setPaused((value) => !value)} aria-pressed={paused}><span>{paused ? '▶' : '⏸'}</span>{paused ? 'Resume' : 'Pause'}</button>
         </div>
+        {trackedDelivery && (
+          <div className="delivery-tracker" role="progressbar" aria-label={`Delivery truck: ${trackedDelivery.quantity} materials arriving in ${trackedDelivery.remaining} seconds`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(deliveryProgress)}>
+            <span className="delivery-truck" style={{ background: `linear-gradient(to top, #8abd58 ${deliveryProgress}%, #e7f2bd ${deliveryProgress}%)` }}>🚚</span>
+            <span>Next delivery · {trackedDelivery.remaining}s</span>
+          </div>
+        )}
         </div>
 
         <aside>
@@ -137,10 +149,25 @@ export default function App() {
             <h2>Construction materials</h2>
             <div className="material-inventory"><span>🧱 Materials <b>{Math.floor(game.resources.materials)}</b></span></div>
             <div className="tools">
-              <button className="tool" disabled={game.money < MATERIAL_ORDER_COST} onClick={() => setGame(orderMaterials)}>
-                <b>Order materials</b>
-                <small>+{MATERIAL_ORDER_AMOUNT} · ${MATERIAL_ORDER_COST.toLocaleString()}</small>
-              </button>
+              {MATERIAL_ORDERS.map((order) => {
+                const cost = game.sawmillBuilt ? Math.floor(order.cost / 2) : order.cost
+                return (
+                  <button key={order.quantity} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => orderMaterials(g, order))}>
+                    <b>Order {order.quantity.toLocaleString()}</b>
+                    <small>${cost.toLocaleString()} · ${Math.round(cost / order.quantity).toLocaleString()} per material</small>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="sawmill-option">
+              {game.sawmillBuilt ? (
+                <small>🪚 Sawmill built · material prices halved · {materialDeliveryTime(game)}s delivery</small>
+              ) : (
+                <button className="tool" disabled={game.money < SAWMILL_COST} onClick={() => setGame(buildSawmill)}>
+                  <b>🪚 Build Sawmill</b>
+                  <small>${SAWMILL_COST.toLocaleString()} · halves material prices and delivery time</small>
+                </button>
+              )}
             </div>
             {game.deliveries.length > 0 ? (
               <ul className="deliveries" aria-label="Incoming material deliveries">
@@ -153,7 +180,7 @@ export default function App() {
             ) : (
               <small className="no-deliveries">No deliveries in transit</small>
             )}
-            <small>Delivery takes {MATERIAL_DELIVERY_TIME} seconds.</small>
+            <small>Delivery takes {materialDeliveryTime(game)} seconds{game.sawmillBuilt ? ' with the sawmill' : ''}.</small>
           </div>
           <div className="panel">
             <h2>Workers</h2>
