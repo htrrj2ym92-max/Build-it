@@ -45,11 +45,11 @@ export const TICKS_PER_DAY = 60
 export const MATERIAL_DELIVERY_TIME = 15
 export const SAWMILL_COST = 50_000
 export const MATERIAL_ORDERS = [
-  { quantity: 100, cost: 10_000 },
-  { quantity: 250, cost: 22_500 },
-  { quantity: 500, cost: 40_000 },
-  { quantity: 1_000, cost: 75_000 },
-  { quantity: 2_500, cost: 150_000 },
-  { quantity: 5_000, cost: 250_000 },
+  { quantity: 100, cost: 10_000, deliveryTime: 5 },
+  { quantity: 250, cost: 22_500, deliveryTime: 5 },
+  { quantity: 500, cost: 40_000, deliveryTime: 8 },
+  { quantity: 1_000, cost: 75_000, deliveryTime: 10 },
+  { quantity: 2_500, cost: 150_000, deliveryTime: 16 },
+  { quantity: 5_000, cost: 250_000, deliveryTime: 20 },
 ] as const
 export const SAVE_KEY = 'build-it-save-v2'

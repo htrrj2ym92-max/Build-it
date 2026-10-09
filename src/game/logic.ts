@@ -1,4 +1,4 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
 import type { BuildingType, Cell, GameState } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
@@ -115,8 +115,8 @@ export const gather = (g: GameState): GameState => ({
   resources: { ...g.resources, materials: g.resources.materials + GATHER_AMOUNT },
 })
 
-export const materialDeliveryTime = (g: GameState) =>
-  g.sawmillBuilt ? MATERIAL_DELIVERY_TIME / 2 : MATERIAL_DELIVERY_TIME
+export const materialDeliveryTime = (g: GameState, order: typeof MATERIAL_ORDERS[number]) =>
+  g.sawmillBuilt ? order.deliveryTime / 2 : order.deliveryTime
 
 export function advanceDeliveries(g: GameState): GameState {
   const resources = { ...g.resources }
@@ -136,7 +136,7 @@ export function advanceDeliveries(g: GameState): GameState {
 export function orderMaterials(g: GameState, order: typeof MATERIAL_ORDERS[number]): GameState {
   const cost = g.sawmillBuilt ? Math.floor(order.cost / 2) : order.cost
   if (g.money < cost) return g
-  const duration = materialDeliveryTime(g)
+  const duration = materialDeliveryTime(g, order)
   return {
     ...g,
     money: g.money - cost,
