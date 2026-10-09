@@ -19,7 +19,7 @@ export const BUILDINGS: Record<BuildingType, BuildingDef> = {
   estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 240000, workers: 5, rentPerDay: 6000, buildTime: 16, upgradeTime: 8, desc: 'High-value upscale residence · $6,000/day rent' },
   mansion: { name: 'Mansion', icon: '🏰', cost: 1200, cashCost: 600000, workers: 7, rentPerDay: 15000, buildTime: 18, upgradeTime: 9, desc: 'Luxury premium property · $15,000/day rent' },
   castle: { name: 'Castle', icon: '🏯', cost: 2500, cashCost: 1200000, workers: 9, rentPerDay: 25000, buildTime: 20, upgradeTime: 10, desc: 'Ultimate high-rent property · $25,000/day rent' },
-  workshop: { name: 'Workshop', icon: '🛠️', cost: 900, cashCost: 0, workers: 3, rentPerDay: 0, buildTime: 15, upgradeTime: 7, desc: 'Utility building · no rental income' },
+  workshop: { name: 'Workshop', icon: '🛠️', cost: 900, cashCost: 0, workers: 3, rentPerDay: 0, buildTime: 15, upgradeTime: 7, desc: 'Halves worker hiring costs' },
   sawmill: { name: 'Sawmill', icon: '🪚', cost: 1250, cashCost: 0, workers: 5, rentPerDay: 0, buildTime: 18, upgradeTime: 9, desc: 'Halves material prices and delivery times' },
 }
 

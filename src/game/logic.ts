@@ -35,6 +35,9 @@ export const canBuild = (g: GameState, type: BuildingType) =>
 export const hasSawmill = (g: GameState) =>
   g.sawmillBuilt === true || g.grid.some((cell) => cell.type === 'sawmill' && isOwned(cell))
 
+export const hasWorkshop = (g: GameState) =>
+  g.grid.some((cell) => cell.type === 'workshop' && isOwned(cell))
+
 export const count = (g: GameState, type: BuildingType) =>
   g.grid.filter((c) => c.type === type && isOwned(c)).length
 
@@ -144,13 +147,14 @@ export function maintain(g: GameState, index: number): GameState {
 
 export const maintenanceCost = (type: BuildingType) => Math.floor(BUILDINGS[type].cost / 5)
 
-export const workerHireCost = (workers: number) => {
+export const workerHireCost = (workers: number, workshopBuilt = false) => {
   if (!Number.isInteger(workers) || workers < 1 || workers > WORKER_HIRE_COSTS.length) return Infinity
-  return WORKER_HIRE_COSTS[workers - 1]
+  const cost = WORKER_HIRE_COSTS[workers - 1]
+  return workshopBuilt ? Math.floor(cost / 2) : cost
 }
 
 export function hireWorkers(g: GameState, workers: number): GameState {
-  const cost = workerHireCost(workers)
+  const cost = workerHireCost(workers, hasWorkshop(g))
   if (!Number.isFinite(cost) || g.money < cost) return g
   return { ...g, money: g.money - cost, hiredWorkers: (g.hiredWorkers ?? 0) + workers }
 }

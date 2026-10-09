@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, changePaintColor, demolish, goalProgress, hasSawmill, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, changePaintColor, demolish, goalProgress, hasSawmill, hasWorkshop, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -198,11 +198,11 @@ export default function App() {
           </div>
           <div className="panel">
             <h2>Workers</h2>
-            <small className="hint">Buildings require the listed number of workers while under construction.</small>
+            <small className="hint">{hasWorkshop(game) ? 'Workshop halves worker hiring costs. ' : ''}Buildings require the listed number of workers while under construction.</small>
             <div className="tools">
               {WORKER_HIRE_COSTS.map((_, index) => {
                 const workers = index + 1
-                const cost = workerHireCost(workers)
+                const cost = workerHireCost(workers, hasWorkshop(game))
                 return (
                   <button key={workers} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => hireWorkers(g, workers))}>
                     <b>Hire {workers} worker{workers === 1 ? '' : 's'}</b>
