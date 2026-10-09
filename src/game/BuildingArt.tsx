@@ -18,32 +18,22 @@ const art: Record<string, ReactNode> = {
   ),
   rambler: (
     <>
-      {/* Front-left face - main wall (tan) */}
       <path fill="#d4b896" stroke="#8b6f47" strokeWidth="2" strokeLinejoin="round" d="M32 48 65 35 65 85 32 78Z" />
-      {/* Right face - side wall (darker tan) */}
       <path fill="#b89968" stroke="#8b6f47" strokeWidth="2" strokeLinejoin="round" d="M65 35 98 45 98 95 65 85Z" />
-      {/* Roof front-left (brown) */}
       <path fill="#9b7d5c" stroke="#6b5436" strokeWidth="2" strokeLinejoin="round" d="M32 48 65 28 65 35 32 55Z" />
-      {/* Roof right (darker brown) */}
       <path fill="#7a6347" stroke="#6b5436" strokeWidth="2" strokeLinejoin="round" d="M65 28 98 38 98 45 65 35Z" />
-      {/* Left side roof shadow */}
       <path fill="#6b5436" stroke="#5a4629" strokeWidth="1.5" strokeLinejoin="round" d="M32 48 32 55 48 60 48 50Z" />
-      {/* Front door */}
       <path fill="#5a3f2e" stroke="#3d2817" strokeWidth="1.5" d="M48 62 58 58v18l-10 2Z" />
       <path stroke="#8b6f47" strokeWidth="0.75" d="M53 60v20" />
       <path fill="#c4a878" d="M50 68h2v6h-2zm4 0h2v6h-2z" />
-      {/* Window 1 */}
       <path fill="#b8e8ed" stroke="#8b6f47" strokeWidth="1" d="M36 54 48 49v8l-12 5Z" />
       <path stroke="#fff0b7" strokeWidth="0.75" d="M42 51v8m-6-4 12 5" />
-      {/* Window 2 */}
       <path fill="#b8e8ed" stroke="#8b6f47" strokeWidth="1" d="M70 52 82 47v8l-12 5Z" />
       <path stroke="#fff0b7" strokeWidth="0.75" d="M76 49v8m-6-4 12 5" />
-      {/* Right side windows */}
       <path fill="#a8d8dd" stroke="#8b6f47" strokeWidth="1" d="M86 57 94 54v7l-8 3Z" />
       <path stroke="#f0e0a8" strokeWidth="0.75" d="M90 56v7" />
       <path fill="#a8d8dd" stroke="#8b6f47" strokeWidth="1" d="M86 72 94 69v7l-8 3Z" />
       <path stroke="#f0e0a8" strokeWidth="0.75" d="M90 71v7" />
-      {/* Chimney */}
       <path fill="#a85c4c" stroke="#6b4033" strokeWidth="1.5" d="M80 35 88 38v12l-8-3Z" />
       <path fill="#8d4a3c" stroke="#6b4033" strokeWidth="1" d="M88 38v12l6-2v-12Z" />
       <path fill="#d97f6b" stroke="#6b4033" strokeWidth="0.75" d="M80 32 88 35l-1 3-8-3Z" />
