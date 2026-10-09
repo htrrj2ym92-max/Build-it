@@ -1,4 +1,4 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDER_AMOUNT, MATERIAL_ORDER_COST, MAX_UPGRADE, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
 import type { BuildingType, Cell, GameState } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
@@ -13,6 +13,7 @@ export const newGame = (level = 0): GameState => ({
   level,
   resources: { materials: 75 },
   deliveries: [],
+  sawmillBuilt: false,
   money: STARTING_MONEY,
   grid: Array.from({ length: levelDef(level).size ** 2 }, () => emptyCell()),
   ticks: 0,
@@ -105,6 +106,11 @@ export function hireWorkers(g: GameState, workers: number): GameState {
   return { ...g, money: g.money - cost, hiredWorkers: (g.hiredWorkers ?? 0) + workers }
 }
 
+export function buildSawmill(g: GameState): GameState {
+  if (g.sawmillBuilt || g.money < SAWMILL_COST) return g
+  return { ...g, money: g.money - SAWMILL_COST, sawmillBuilt: true }
+}
+
 export function sell(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell || !isOwned(cell)) return g
@@ -116,14 +122,20 @@ export const gather = (g: GameState): GameState => ({
   resources: { ...g.resources, materials: g.resources.materials + GATHER_AMOUNT },
 })
 
-export function orderMaterials(g: GameState): GameState {
-  if (g.money < MATERIAL_ORDER_COST) return g
+export const materialDeliveryTime = (g: GameState) =>
+  g.sawmillBuilt ? Math.max(1, Math.floor(MATERIAL_DELIVERY_TIME / 2)) : MATERIAL_DELIVERY_TIME
+
+export function orderMaterials(g: GameState, order: typeof MATERIAL_ORDERS[number]): GameState {
+  const cost = g.sawmillBuilt ? Math.floor(order.cost / 2) : order.cost
+  if (g.money < cost) return g
+  const duration = materialDeliveryTime(g)
   return {
     ...g,
-    money: g.money - MATERIAL_ORDER_COST,
+    money: g.money - cost,
     deliveries: [...g.deliveries, {
-      quantity: MATERIAL_ORDER_AMOUNT,
-      remaining: MATERIAL_DELIVERY_TIME,
+      quantity: order.quantity,
+      remaining: duration,
+      duration,
     }],
   }
 }
@@ -175,8 +187,10 @@ export function isValid(s: unknown): s is GameState {
     (g.deliveries === undefined || (Array.isArray(g.deliveries) && g.deliveries.every((delivery) =>
       delivery &&
       Number.isInteger(delivery.quantity) && delivery.quantity > 0 &&
-      Number.isInteger(delivery.remaining) && delivery.remaining > 0))) &&
+      Number.isInteger(delivery.remaining) && delivery.remaining > 0 &&
+      (delivery.duration === undefined || (Number.isInteger(delivery.duration) && delivery.duration > 0))))) &&
     (g.money === undefined || (typeof g.money === 'number' && Number.isFinite(g.money) && g.money >= 0)) &&
+    (g.sawmillBuilt === undefined || typeof g.sawmillBuilt === 'boolean') &&
     g.grid.every((c) => c && (c.type === null || c.type in BUILDINGS) && typeof c.lotOwned === 'boolean' && typeof c.remaining === 'number' &&
       (c.level === undefined || (Number.isInteger(c.level) && c.level >= 0 && c.level <= MAX_UPGRADE)) &&
       (c.condition === undefined || (typeof c.condition === 'number' && c.condition >= 0 && c.condition <= 100)))

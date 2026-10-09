@@ -1,4 +1,4 @@
-import { SAVE_KEY, STARTING_MONEY } from './data'
+import { MATERIAL_DELIVERY_TIME, SAVE_KEY, STARTING_MONEY } from './data'
 import { isValid, newGame } from './logic'
 import type { GameState } from './types'
 
@@ -10,9 +10,13 @@ export function loadGame(): GameState {
       if (isValid(parsed)) return {
         ...parsed,
         money: parsed.money ?? STARTING_MONEY,
-        deliveries: parsed.deliveries ?? [],
+        deliveries: (parsed.deliveries ?? []).map((delivery) => ({
+          ...delivery,
+          duration: delivery.duration ?? MATERIAL_DELIVERY_TIME,
+        })),
         grid: parsed.grid.map((c) => ({ ...c, lotOwned: c.lotOwned === true, level: c.level ?? 0, condition: c.condition ?? 100, sold: c.sold === true })),
         hiredWorkers: parsed.hiredWorkers ?? 0,
+        sawmillBuilt: parsed.sawmillBuilt ?? false,
       }
     }
   } catch {

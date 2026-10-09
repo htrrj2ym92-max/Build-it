@@ -2,7 +2,7 @@
 
 A browser city-building game inspired by Build-a-lot. React + TypeScript + Vite.
 
-Buy unowned lots for $25,000, then build one of six home types using materials and the required number of workers. Gather or order materials, collect rent from completed homes, and complete each level's goals. Progress is saved automatically to localStorage.
+Buy unowned lots for $25,000, then build one of six home types using materials and the required number of workers. Gather or order materials in six quantities, or build a $50,000 sawmill to halve material prices and delivery times for the current level. Sell completed homes at any time, collect rent, and complete each level's goals. Progress is saved automatically to localStorage.
 
 ## Develop
 ```

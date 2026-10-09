@@ -42,7 +42,14 @@ export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
 export const WORKER_HIRE_COSTS = [50_000, 90_000, 120_000] as const
 export const TICKS_PER_DAY = 60
-export const MATERIAL_ORDER_AMOUNT = 10
 export const MATERIAL_DELIVERY_TIME = 10
-export const MATERIAL_ORDER_COST = 1000
+export const SAWMILL_COST = 50_000
+export const MATERIAL_ORDERS = [
+  { quantity: 100, cost: 10_000 },
+  { quantity: 250, cost: 22_500 },
+  { quantity: 500, cost: 40_000 },
+  { quantity: 1_000, cost: 75_000 },
+  { quantity: 2_500, cost: 150_000 },
+  { quantity: 5_000, cost: 250_000 },
+] as const
 export const SAVE_KEY = 'build-it-save-v2'
