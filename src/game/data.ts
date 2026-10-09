@@ -1,4 +1,4 @@
-import type { BuildingType } from './types'
+import type { BuildingType, PaintColor } from './types'
 
 export interface BuildingDef {
   name: string
@@ -15,12 +15,18 @@ export const BUILDINGS: Record<BuildingType, BuildingDef> = {
   rambler: { name: 'Rambler', icon: '🏠', cost: 75, cashCost: 50000, workers: 1, rentPerDay: 1000, buildTime: 3, desc: 'Entry-level home · $1,000/day rent' },
   colonial: { name: 'Colonial', icon: '🏡', cost: 150, cashCost: 75000, workers: 2, rentPerDay: 1500, buildTime: 4, desc: 'Modest mid-tier home · $1,500/day rent' },
   tudor: { name: 'Tudor', icon: '🏘️', cost: 300, cashCost: 150000, workers: 3, rentPerDay: 3000, buildTime: 6, desc: 'Stylish family home · $3,000/day rent' },
-  estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 300000, workers: 5, rentPerDay: 6000, buildTime: 8, desc: 'High-value upscale residence · $6,000/day rent' },
+  estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 240000, workers: 5, rentPerDay: 6000, buildTime: 8, desc: 'High-value upscale residence · $6,000/day rent' },
   mansion: { name: 'Mansion', icon: '🏰', cost: 1200, cashCost: 600000, workers: 7, rentPerDay: 15000, buildTime: 10, desc: 'Luxury premium property · $15,000/day rent' },
   castle: { name: 'Castle', icon: '🏯', cost: 2500, cashCost: 1200000, workers: 9, rentPerDay: 25000, buildTime: 14, desc: 'Ultimate high-rent property · $25,000/day rent' },
 }
 
 export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', 'estate', 'mansion', 'castle']
+export const PAINT_COLORS: { id: PaintColor; name: string; value: string; hue: number }[] = [
+  { id: 'red', name: 'Red', value: '#d95d4c', hue: 0 },
+  { id: 'blue', name: 'Blue', value: '#4387bd', hue: 200 },
+  { id: 'green', name: 'Green', value: '#4a8c55', hue: 90 },
+  { id: 'yellow', name: 'Yellow', value: '#e6bd43', hue: 45 },
+]
 
 export interface Level {
   size: number

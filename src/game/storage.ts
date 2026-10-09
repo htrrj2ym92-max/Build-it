@@ -1,4 +1,4 @@
-import { MATERIAL_DELIVERY_TIME, SAVE_KEY, STARTING_MONEY } from './data'
+import { MATERIAL_DELIVERY_TIME, PAINT_COLORS, SAVE_KEY, STARTING_MONEY } from './data'
 import { isValid, newGame } from './logic'
 import type { GameState } from './types'
 
@@ -14,7 +14,7 @@ export function loadGame(): GameState {
           ...delivery,
           duration: delivery.duration ?? MATERIAL_DELIVERY_TIME,
         })),
-        grid: parsed.grid.map((c) => ({ ...c, lotOwned: c.lotOwned === true, level: c.level ?? 0, condition: c.condition ?? 100, painted: c.painted === true, landscaped: c.landscaped === true, sold: c.sold === true })),
+        grid: parsed.grid.map((c) => ({ ...c, lotOwned: c.lotOwned === true, level: c.level ?? 0, condition: c.condition ?? 100, painted: c.painted === true, paintColor: c.paintColor ?? (c.painted ? PAINT_COLORS[0].id : undefined), landscaped: c.landscaped === true, sold: c.sold === true })),
         hiredWorkers: parsed.hiredWorkers ?? 0,
         sawmillBuilt: parsed.sawmillBuilt ?? false,
       }

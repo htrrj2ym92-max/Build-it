@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react'
-import type { BuildingType } from './types'
+import { PAINT_COLORS } from './data'
+import type { BuildingType, PaintColor } from './types'
 
 const art: Record<string, ReactNode> = {
   house: (
@@ -121,9 +122,10 @@ const homeArt: Record<BuildingType, ReactNode> = {
   castle: art.castle,
 }
 
-export default function BuildingArt({ type, progress = 1, level = 0 }: { type: BuildingType; progress?: number; level?: number }) {
+export default function BuildingArt({ type, progress = 1, level = 0, paintColor }: { type: BuildingType; progress?: number; level?: number; paintColor?: PaintColor }) {
   const clipId = useId().replace(/:/g, '')
   const reveal = progress >= 1 ? 1 : progress < 0.25 ? 0 : progress < 0.55 ? 0.52 : 0.88
+  const paintHue = PAINT_COLORS.find(({ id }) => id === paintColor)?.hue ?? 0
   const foundationColors: Record<BuildingType, string> = {
     rambler: '#d8b982',
     colonial: '#d7c69d',
@@ -152,7 +154,7 @@ export default function BuildingArt({ type, progress = 1, level = 0 }: { type: B
               <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
             </clipPath>
           </defs>
-          <g clipPath={`url(#${clipId})`}>{homeArt[type]}</g>
+          <g clipPath={`url(#${clipId})`} style={paintColor ? { filter: `hue-rotate(${paintHue}deg)` } : undefined}>{homeArt[type]}</g>
           {progress >= 1 && level >= 1 && (
             <>
               <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />
