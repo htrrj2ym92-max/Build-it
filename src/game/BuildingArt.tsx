@@ -16,6 +16,39 @@ const art: Record<string, ReactNode> = {
       <path fill="#a94e3f" stroke="#8d5736" strokeWidth="2" d="M78 30V15l9 5v15Z" />
     </>
   ),
+  rambler: (
+    <>
+      {/* Front-left face - main wall (tan) */}
+      <path fill="#d4b896" stroke="#8b6f47" strokeWidth="2" strokeLinejoin="round" d="M32 48 65 35 65 85 32 78Z" />
+      {/* Right face - side wall (darker tan) */}
+      <path fill="#b89968" stroke="#8b6f47" strokeWidth="2" strokeLinejoin="round" d="M65 35 98 45 98 95 65 85Z" />
+      {/* Roof front-left (brown) */}
+      <path fill="#9b7d5c" stroke="#6b5436" strokeWidth="2" strokeLinejoin="round" d="M32 48 65 28 65 35 32 55Z" />
+      {/* Roof right (darker brown) */}
+      <path fill="#7a6347" stroke="#6b5436" strokeWidth="2" strokeLinejoin="round" d="M65 28 98 38 98 45 65 35Z" />
+      {/* Left side roof shadow */}
+      <path fill="#6b5436" stroke="#5a4629" strokeWidth="1.5" strokeLinejoin="round" d="M32 48 32 55 48 60 48 50Z" />
+      {/* Front door */}
+      <path fill="#5a3f2e" stroke="#3d2817" strokeWidth="1.5" d="M48 62 58 58v18l-10 2Z" />
+      <path stroke="#8b6f47" strokeWidth="0.75" d="M53 60v20" />
+      <path fill="#c4a878" d="M50 68h2v6h-2zm4 0h2v6h-2z" />
+      {/* Window 1 */}
+      <path fill="#b8e8ed" stroke="#8b6f47" strokeWidth="1" d="M36 54 48 49v8l-12 5Z" />
+      <path stroke="#fff0b7" strokeWidth="0.75" d="M42 51v8m-6-4 12 5" />
+      {/* Window 2 */}
+      <path fill="#b8e8ed" stroke="#8b6f47" strokeWidth="1" d="M70 52 82 47v8l-12 5Z" />
+      <path stroke="#fff0b7" strokeWidth="0.75" d="M76 49v8m-6-4 12 5" />
+      {/* Right side windows */}
+      <path fill="#a8d8dd" stroke="#8b6f47" strokeWidth="1" d="M86 57 94 54v7l-8 3Z" />
+      <path stroke="#f0e0a8" strokeWidth="0.75" d="M90 56v7" />
+      <path fill="#a8d8dd" stroke="#8b6f47" strokeWidth="1" d="M86 72 94 69v7l-8 3Z" />
+      <path stroke="#f0e0a8" strokeWidth="0.75" d="M90 71v7" />
+      {/* Chimney */}
+      <path fill="#a85c4c" stroke="#6b4033" strokeWidth="1.5" d="M80 35 88 38v12l-8-3Z" />
+      <path fill="#8d4a3c" stroke="#6b4033" strokeWidth="1" d="M88 38v12l6-2v-12Z" />
+      <path fill="#d97f6b" stroke="#6b4033" strokeWidth="0.75" d="M80 32 88 35l-1 3-8-3Z" />
+    </>
+  ),
   lumber: (
     <>
       <path fill="#c8884b" stroke="#784a30" strokeWidth="2" strokeLinejoin="round" d="m24 53 39-17 33 17v30L63 100 24 82Z" />
@@ -89,7 +122,7 @@ const art: Record<string, ReactNode> = {
       <path fill="#d7d9d2" stroke="#606b70" strokeWidth="2" d="M43 41V29l8 4v-8l8 4v-8l10 5v12Z" />
       <path fill="#b7bfbe" stroke="#606b70" strokeWidth="2" d="M64 38V26l9 5v-8l8 4v-8l10 6v22Z" />
       <path fill="#8d4f4e" stroke="#60413c" strokeWidth="2" strokeLinejoin="round" d="m29 42 35-25 38 24-9 10-29-18-27 19Z" />
-      <path fill="#b86a5c" stroke="#60413c" strokeWidth="2" strokeLinejoin="round" d="m64 17 38 24-9 10-29-18Z" />
+      <path fill="#bd6b5b" stroke="#60413c" strokeWidth="2" strokeLinejoin="round" d="m64 17 38 24-9 10-29-18Z" />
       <path fill="#614c43" stroke="#4b413a" strokeWidth="2" d="M55 73a9 9 0 0 1 18 0v25l-18 7Z" />
       <path fill="#f5cf78" stroke="#606b70" strokeWidth="2" d="M44 51h8v13h-8zm35 1h8v13h-8z" />
       <path fill="#78b7c0" stroke="#606b70" strokeWidth="2" d="M70 53h8v12h-8z" />
@@ -114,7 +147,7 @@ const art: Record<string, ReactNode> = {
 }
 
 const buildingArt: Record<BuildingType, ReactNode> = {
-  rambler: art.house,
+  rambler: art.rambler,
   colonial: art.market,
   tudor: art.workshop,
   estate: art.hut,
