@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -261,13 +261,13 @@ export default function App() {
                   <b>⬆️ Upgrade</b>
                   <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${BUILDINGS[sel.type].cost.toLocaleString()} materials · No cash cost`}</small>
                 </button>
-                <button className="tool" disabled={sel.painted} onClick={() => act(paintBuilding)}>
+                <button className="tool" disabled={sel.painted || game.resources.materials < improvementCost(sel.type)} onClick={() => act(paintBuilding)}>
                   <b>🎨 Paint</b>
-                  <small>{sel.painted ? 'Already painted' : '+5% value · No cash cost'}</small>
+                  <small>{sel.painted ? 'Already painted' : `+5% value · ${improvementCost(sel.type)} materials`}</small>
                 </button>
-                <button className="tool" disabled={sel.landscaped} onClick={() => act(landscape)}>
+                <button className="tool" disabled={sel.landscaped || game.resources.materials < improvementCost(sel.type)} onClick={() => act(landscape)}>
                   <b>🌿 Landscape</b>
-                  <small>{sel.landscaped ? 'Already landscaped' : '+5% value · No cash cost'}</small>
+                  <small>{sel.landscaped ? 'Already landscaped' : `+5% value · ${improvementCost(sel.type)} materials`}</small>
                 </button>
                 <button className="tool" disabled={sel.condition >= 100 || game.resources.materials < maintenanceCost(sel.type)} onClick={() => act(maintain)}>
                   <b>🔧 Maintain</b>
