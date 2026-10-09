@@ -27,7 +27,6 @@ export const busyBuilders = (g: GameState) => g.grid.reduce((total, c) =>
   total + (c.type && c.remaining > 0 ? BUILDINGS[c.type].workers : 0), 0)
 
 export const canAfford = (g: GameState, type: BuildingType) =>
-  g.money >= BUILDINGS[type].cashCost &&
   g.resources.materials >= BUILDINGS[type].cost
 
 export const canBuild = (g: GameState, type: BuildingType) =>
@@ -43,7 +42,7 @@ export function build(g: GameState, index: number, type: BuildingType): GameStat
   resources.materials -= BUILDINGS[type].cost
   const grid = g.grid.slice()
   grid[index] = { ...emptyCell(true), type, remaining: BUILDINGS[type].buildTime }
-  return { ...g, resources, money: g.money - BUILDINGS[type].cashCost, grid }
+  return { ...g, resources, grid }
 }
 
 export function buyLot(g: GameState, index: number): GameState {
@@ -61,7 +60,7 @@ export function demolish(g: GameState, index: number): GameState {
   resources.materials += Math.floor(BUILDINGS[cell.type].cost / 2)
   const grid = g.grid.slice()
   grid[index] = emptyCell(cell.lotOwned)
-  return { ...g, resources, money: g.money + Math.floor(BUILDINGS[cell.type].cashCost / 2), grid }
+  return { ...g, resources, grid }
 }
 
 export const upgradeCost = (cell: Cell) =>
