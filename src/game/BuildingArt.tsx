@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react'
+import ramblerImage from '../../rambler.png'
 import { PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
 
@@ -166,6 +167,10 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
     castle: '#aeb8b5',
     workshop: '#bd9a6e',
     sawmill: '#bd9a6e',
+  }
+
+  if (type === 'rambler') {
+    return <img className="rambler-art" src={ramblerImage} alt="" aria-hidden="true" />
   }
 
   return (
