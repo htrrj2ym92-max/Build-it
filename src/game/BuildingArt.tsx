@@ -18,35 +18,31 @@ const art: Record<string, ReactNode> = {
   ),
   rambler: (
     <>
-      {/* Front-left face - main wall (tan) */}
-      <path fill="#d4b896" stroke="#8b6f47" strokeWidth="2" strokeLinejoin="round" d="M32 48 65 35 65 85 32 78Z" />
-      {/* Right face - side wall (darker tan) */}
-      <path fill="#b89968" stroke="#8b6f47" strokeWidth="2" strokeLinejoin="round" d="M65 35 98 45 98 95 65 85Z" />
-      {/* Roof front-left (brown) */}
-      <path fill="#9b7d5c" stroke="#6b5436" strokeWidth="2" strokeLinejoin="round" d="M32 48 65 28 65 35 32 55Z" />
-      {/* Roof right (darker brown) */}
-      <path fill="#7a6347" stroke="#6b5436" strokeWidth="2" strokeLinejoin="round" d="M65 28 98 38 98 45 65 35Z" />
-      {/* Left side roof shadow */}
-      <path fill="#6b5436" stroke="#5a4629" strokeWidth="1.5" strokeLinejoin="round" d="M32 48 32 55 48 60 48 50Z" />
-      {/* Front door */}
-      <path fill="#5a3f2e" stroke="#3d2817" strokeWidth="1.5" d="M48 62 58 58v18l-10 2Z" />
-      <path stroke="#8b6f47" strokeWidth="0.75" d="M53 60v20" />
-      <path fill="#c4a878" d="M50 68h2v6h-2zm4 0h2v6h-2z" />
-      {/* Window 1 */}
-      <path fill="#b8e8ed" stroke="#8b6f47" strokeWidth="1" d="M36 54 48 49v8l-12 5Z" />
-      <path stroke="#fff0b7" strokeWidth="0.75" d="M42 51v8m-6-4 12 5" />
-      {/* Window 2 */}
-      <path fill="#b8e8ed" stroke="#8b6f47" strokeWidth="1" d="M70 52 82 47v8l-12 5Z" />
-      <path stroke="#fff0b7" strokeWidth="0.75" d="M76 49v8m-6-4 12 5" />
-      {/* Right side windows */}
-      <path fill="#a8d8dd" stroke="#8b6f47" strokeWidth="1" d="M86 57 94 54v7l-8 3Z" />
-      <path stroke="#f0e0a8" strokeWidth="0.75" d="M90 56v7" />
-      <path fill="#a8d8dd" stroke="#8b6f47" strokeWidth="1" d="M86 72 94 69v7l-8 3Z" />
-      <path stroke="#f0e0a8" strokeWidth="0.75" d="M90 71v7" />
-      {/* Chimney */}
-      <path fill="#a85c4c" stroke="#6b4033" strokeWidth="1.5" d="M80 35 88 38v12l-8-3Z" />
-      <path fill="#8d4a3c" stroke="#6b4033" strokeWidth="1" d="M88 38v12l6-2v-12Z" />
-      <path fill="#d97f6b" stroke="#6b4033" strokeWidth="0.75" d="M80 32 88 35l-1 3-8-3Z" />
+      <path fill="#994e3d" stroke="#633c32" strokeWidth="1.5" d="m31 27 9-4v22l-9 4Z" />
+      <path fill="#7f4035" stroke="#633c32" strokeWidth="1.5" d="m40 23 7 4v19l-7-1Z" />
+      <path fill="#bd7056" stroke="#633c32" strokeWidth="1.25" d="m29 27 11-6 9 5-10 6Z" />
+      <path stroke="#633c32" strokeWidth=".8" d="m32 34 8-4m-8 10 8-4m2-7 5 3m-5 6 5 3" />
+      <path fill="#ddc39c" stroke="#806547" strokeWidth="2" strokeLinejoin="round" d="m28 49 37-15 36 14v39L65 104 28 82Z" />
+      <path fill="#c7a879" stroke="#806547" strokeWidth="2" strokeLinejoin="round" d="m65 34 36 14v39L65 104Z" />
+      <path fill="#3e3028" stroke="#2d2621" strokeWidth="2" strokeLinejoin="round" d="m19 48 45-27 44 22-7 10-37-19-37 23Z" />
+      <path fill="#594133" stroke="#2d2621" strokeWidth="1.5" strokeLinejoin="round" d="m64 21 44 22-7 10-37-19Z" />
+      <path stroke="#795a43" strokeWidth="1" d="m29 43 37-21m-31 26 37-22m-29 27 38-23m-4 8 25 13m-18-22 25 13m-31-18 26 13" />
+      <path fill="#492f25" stroke="#33241e" strokeWidth="1.5" strokeLinejoin="round" d="m43 59 11-10 12 6 10-4 10 6-7 5-10-5-12 8Z" />
+      <path fill="#654735" stroke="#33241e" strokeWidth="1" strokeLinejoin="round" d="m54 49 12 6 10-4 10 6-7 5-10-5-3 2v-7Z" />
+      <path fill="#d8bb8f" d="m31 58 4-2v21l-4-2zm32-11 3 1v37l-3 2z" />
+      <path fill="#294e70" stroke="#243a4a" strokeWidth="1" d="m34 61 4-2v11l-4 2zm13-6 4-2v11l-4 2zm27 1 4-2v12l-4 2zm13 5 4-2v11l-4 2z" />
+      <path fill="#f3a84f" stroke="#70452e" strokeWidth="1.25" d="m38 60 9-4v10l-9 4Zm30-2 6-3v12l-6 3Z" />
+      <path fill="#ffd77a" d="m40 61 5-2v7l-5 2zm30-1 2-1v8l-2 1z" />
+      <path stroke="#ffe5a1" strokeWidth=".8" d="m43 59v9m-4-3 8-4m25-2v9m-4-4 6-3" />
+      <path fill="#315b7c" d="m32 60 2-1v12l-2 1zm17-7 2-1v12l-2 1zm23 5 2-1v12l-2 1zm17 3 2-1v12l-2 1z" />
+      <path fill="#603c2c" stroke="#3f2c23" strokeWidth="1.5" d="m50 73 12-5v20l-12 6Z" />
+      <path fill="#815237" d="m52 75 8-3v14l-8 4Z" />
+      <path fill="#e4c695" d="m58 78 2-1v2l-2 1z" />
+      <path fill="#eee0be" stroke="#765b3d" strokeWidth="1" d="m47 92 19-9v5l-19 9Z" />
+      <path fill="#86613f" stroke="#634a34" strokeWidth="1" d="m47 97 19-9 8 4-19 10Z" />
+      <path fill="#d9bc91" stroke="#806547" strokeWidth="1" d="m44 66 3-2v27l-3-2zm25-10 2 1v33l-2 2z" />
+      <path fill="#e2c99e" stroke="#806547" strokeWidth="1" d="M48 68v20m20-24v19" />
+      <path stroke="#8e704e" strokeWidth=".75" d="m29 68 3 1m-3 7 3 1m38-3 3-1m-3 7 3-1m-34-16 4-2m-4 8 4-2m40 1 3-1m-3 8 3-1" />
     </>
   ),
   lumber: (
