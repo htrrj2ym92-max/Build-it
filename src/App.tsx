@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -257,9 +257,9 @@ export default function App() {
               <p>This property was sold and no longer earns you income.</p>
             ) : (
               <div className="build-options">
-                <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.resources.materials < BUILDINGS[sel.type].cost} onClick={() => act(upgrade)}>
+                <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level)} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
-                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${BUILDINGS[sel.type].cost.toLocaleString()} materials · No cash cost`}</small>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · No cash cost`}</small>
                 </button>
                 <button className="tool" disabled={sel.painted || game.resources.materials < improvementCost(sel.type)} onClick={() => act(paintBuilding)}>
                   <b>🎨 Paint</b>
