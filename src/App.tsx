@@ -207,7 +207,7 @@ export default function App() {
                 return (
                   <div key={t} className={'tool info' + (canBuild(game, t) ? '' : ' poor')} title={def.desc}>
                     <b>{def.icon} {def.name}</b>
-                    <small>${def.cashCost.toLocaleString()} · {costLabel(t)} · {def.workers} worker{def.workers === 1 ? '' : 's'}</small>
+                    <small>{costLabel(t)} · {def.workers} worker{def.workers === 1 ? '' : 's'}</small>
                     <small>{def.desc}</small>
                   </div>
                 )
@@ -251,7 +251,7 @@ export default function App() {
                 </button>
                 <button className="tool" onClick={() => act(demolish, true)}>
                   <b>💥 Demolish</b>
-                  <small>Refunds 50% of base cost</small>
+                  <small>Returns 50% of materials</small>
                 </button>
               </div>
             )}
@@ -284,7 +284,7 @@ export default function App() {
                     return (
                       <button key={type} className={'tool' + (affordable && enoughWorkers ? '' : ' poor')} disabled={!affordable || !enoughWorkers} onClick={() => constructAt(type)}>
                         <b>{def.icon} {def.name}</b>
-                        <small>${def.cashCost.toLocaleString()} · {costLabel(type)}</small>
+                        <small>{costLabel(type)}</small>
                         <small>{def.workers} worker{def.workers === 1 ? '' : 's'} · {def.buildTime}s</small>
                         <small>{def.desc}</small>
                       </button>
