@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, materialDeliveryTime, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, maintain, materialDeliveryTime, newGame, nextLevel, orderMaterials, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -14,6 +14,7 @@ export default function App() {
   const [selectedLot, setSelectedLot] = useState<number | null>(null)
   const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null)
   const [paused, setPaused] = useState(false)
+  const previousMoney = useRef(game.money)
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -21,7 +22,32 @@ export default function App() {
     }, 1000)
     return () => clearInterval(id)
   }, [paused])
+  useEffect(() => {
+    if (paused) return
+    const id = setInterval(() => setGame(advanceDeliveries), 500)
+    return () => clearInterval(id)
+  }, [paused])
   useEffect(() => saveGame(game), [game])
+  useEffect(() => {
+    if (game.money > previousMoney.current) {
+      const context = new AudioContext()
+      const oscillator = context.createOscillator()
+      const volume = context.createGain()
+      const now = context.currentTime
+      oscillator.type = 'sine'
+      oscillator.frequency.setValueAtTime(880, now)
+      oscillator.frequency.setValueAtTime(1320, now + 0.08)
+      volume.gain.setValueAtTime(0.0001, now)
+      volume.gain.exponentialRampToValueAtTime(0.12, now + 0.02)
+      volume.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
+      oscillator.connect(volume)
+      volume.connect(context.destination)
+      oscillator.start(now)
+      oscillator.stop(now + 0.2)
+      oscillator.onended = () => void context.close()
+    }
+    previousMoney.current = game.money
+  }, [game.money])
 
   const size = Math.sqrt(game.grid.length)
   const rent = rentalIncome(game)
@@ -251,7 +277,7 @@ export default function App() {
                 </button>
                 <button className="tool" onClick={() => act(demolish, true)}>
                   <b>💥 Demolish</b>
-                  <small>Returns 50% of materials</small>
+                  <small>Returns 60% of materials</small>
                 </button>
               </div>
             )}

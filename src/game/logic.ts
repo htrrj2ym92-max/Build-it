@@ -57,7 +57,7 @@ export function demolish(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell?.type || cell.sold) return g
   const resources = { ...g.resources }
-  resources.materials += Math.floor(BUILDINGS[cell.type].cost / 2)
+  resources.materials += Math.floor(BUILDINGS[cell.type].cost * 3 / 5)
   const grid = g.grid.slice()
   grid[index] = emptyCell(cell.lotOwned)
   return { ...g, resources, grid }
@@ -116,7 +116,22 @@ export const gather = (g: GameState): GameState => ({
 })
 
 export const materialDeliveryTime = (g: GameState) =>
-  g.sawmillBuilt ? Math.max(1, Math.floor(MATERIAL_DELIVERY_TIME / 2)) : MATERIAL_DELIVERY_TIME
+  g.sawmillBuilt ? MATERIAL_DELIVERY_TIME / 2 : MATERIAL_DELIVERY_TIME
+
+export function advanceDeliveries(g: GameState): GameState {
+  const resources = { ...g.resources }
+  let changed = false
+  const deliveries = g.deliveries.flatMap((delivery) => {
+    const remaining = Math.max(0, delivery.remaining - 0.5)
+    changed = true
+    if (remaining === 0) {
+      resources.materials += delivery.quantity
+      return []
+    }
+    return [{ ...delivery, remaining }]
+  })
+  return changed ? { ...g, resources, deliveries } : g
+}
 
 export function orderMaterials(g: GameState, order: typeof MATERIAL_ORDERS[number]): GameState {
   const cost = g.sawmillBuilt ? Math.floor(order.cost / 2) : order.cost
@@ -152,11 +167,6 @@ export function tick(g: GameState): GameState {
   const resources = { ...g.resources }
   const ticks = g.ticks + 1
   const decay = ticks % CONDITION_DECAY_TICKS === 0
-  const deliveries = g.deliveries.filter((delivery) => delivery.remaining > 1)
-    .map((delivery) => ({ ...delivery, remaining: delivery.remaining - 1 }))
-  g.deliveries.forEach((delivery) => {
-    if (delivery.remaining <= 1) resources.materials += delivery.quantity
-  })
   const grid: Cell[] = g.grid.map((c) =>
     c.type && c.remaining > 0
       ? { ...c, remaining: Math.max(0, c.remaining - 1) }
@@ -164,7 +174,7 @@ export function tick(g: GameState): GameState {
         ? { ...c, condition: c.condition - 1 }
         : c)
   const rent = ticks % TICKS_PER_DAY === 0 ? rentalIncome({ ...g, grid }) : 0
-  const next = { ...g, resources, deliveries, money: g.money + rent, grid, ticks }
+  const next = { ...g, resources, money: g.money + rent, grid, ticks }
   return { ...next, won: goalProgress(next).every((i) => i.have >= i.need) }
 }
 
@@ -180,8 +190,8 @@ export function isValid(s: unknown): s is GameState {
     (g.deliveries === undefined || (Array.isArray(g.deliveries) && g.deliveries.every((delivery) =>
       delivery &&
       Number.isInteger(delivery.quantity) && delivery.quantity > 0 &&
-      Number.isInteger(delivery.remaining) && delivery.remaining > 0 &&
-      (delivery.duration === undefined || (Number.isInteger(delivery.duration) && delivery.duration > 0))))) &&
+      Number.isFinite(delivery.remaining) && delivery.remaining > 0 &&
+      (delivery.duration === undefined || (Number.isFinite(delivery.duration) && delivery.duration > 0))))) &&
     (g.money === undefined || (typeof g.money === 'number' && Number.isFinite(g.money) && g.money >= 0)) &&
     (g.sawmillBuilt === undefined || typeof g.sawmillBuilt === 'boolean') &&
     g.grid.every((c) => c && (c.type === null || c.type in BUILDINGS) && typeof c.lotOwned === 'boolean' && typeof c.remaining === 'number' &&

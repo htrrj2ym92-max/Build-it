@@ -42,7 +42,7 @@ export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
 export const WORKER_HIRE_COSTS = [50_000, 90_000, 120_000] as const
 export const TICKS_PER_DAY = 60
-export const MATERIAL_DELIVERY_TIME = 10
+export const MATERIAL_DELIVERY_TIME = 15
 export const SAWMILL_COST = 50_000
 export const MATERIAL_ORDERS = [
   { quantity: 100, cost: 10_000 },
