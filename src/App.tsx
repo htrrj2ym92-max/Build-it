@@ -184,16 +184,14 @@ export default function App() {
                 )
               })}
             </div>
-            <div className="sawmill-option">
-              {game.sawmillBuilt ? (
-                <small>🪚 Sawmill built · material prices and delivery times halved</small>
-              ) : (
+            {!game.sawmillBuilt && (
+              <div className="sawmill-option">
                 <button className="tool" disabled={game.money < SAWMILL_COST} onClick={() => setGame(buildSawmill)}>
                   <b>🪚 Build Sawmill</b>
                   <small>${SAWMILL_COST.toLocaleString()} · halves material prices and delivery time</small>
                 </button>
-              )}
-            </div>
+              </div>
+            )}
             {game.deliveries.length > 0 ? (
               <ul className="deliveries" aria-label="Incoming material deliveries">
                 {game.deliveries.map((delivery, index) => (
@@ -202,10 +200,7 @@ export default function App() {
                   </li>
                 ))}
               </ul>
-            ) : (
-              <small className="no-deliveries">No deliveries in transit</small>
             )}
-            <small>Delivery progress is shown while materials are in transit.</small>
           </div>
           <div className="panel">
             <h2>Workers</h2>
