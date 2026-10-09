@@ -257,9 +257,9 @@ export default function App() {
               <p>This property was sold and no longer earns you income.</p>
             ) : (
               <div className="build-options">
-                <button className="tool" disabled={sel.level >= MAX_UPGRADE} onClick={() => act(upgrade)}>
+                <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.resources.materials < BUILDINGS[sel.type].cost} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
-                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : '+10% value · No cash cost'}</small>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${BUILDINGS[sel.type].cost.toLocaleString()} materials · No cash cost`}</small>
                 </button>
                 <button className="tool" disabled={sel.painted} onClick={() => act(paintBuilding)}>
                   <b>🎨 Paint</b>

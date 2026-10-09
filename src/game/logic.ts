@@ -78,8 +78,16 @@ const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, gain = 0
 
 export function upgrade(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
-  return updateCell(g, index, (c) => ({ ...c, level: c.level + 1 }))
+  if (!cell || !cell.type || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
+  const materials = BUILDINGS[cell.type].cost
+  if (g.resources.materials < materials) return g
+  const grid = g.grid.slice()
+  grid[index] = { ...cell, level: cell.level + 1 }
+  return {
+    ...g,
+    resources: { ...g.resources, materials: g.resources.materials - materials },
+    grid,
+  }
 }
 
 export function landscape(g: GameState, index: number): GameState {
