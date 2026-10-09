@@ -105,8 +105,14 @@ export function paintBuilding(g: GameState, index: number): GameState {
 export function maintain(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell || !isOwned(cell) || cell.condition >= 100) return g
-  return updateCell(g, index, (c) => ({ ...c, condition: 100 }))
+  const cost = maintenanceCost(cell.type)
+  if (g.resources.materials < cost) return g
+  const grid = g.grid.slice()
+  grid[index] = { ...cell, condition: 100 }
+  return { ...g, resources: { ...g.resources, materials: g.resources.materials - cost }, grid }
 }
+
+export const maintenanceCost = (type: BuildingType) => Math.floor(BUILDINGS[type].cost / 5)
 
 export const workerHireCost = (workers: number) => {
   if (!Number.isInteger(workers) || workers < 1 || workers > WORKER_HIRE_COSTS.length) return Infinity

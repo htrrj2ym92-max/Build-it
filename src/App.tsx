@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, landscape, maintain, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -269,9 +269,9 @@ export default function App() {
                   <b>🌿 Landscape</b>
                   <small>{sel.landscaped ? 'Already landscaped' : '+5% value · No cash cost'}</small>
                 </button>
-                <button className="tool" disabled={sel.condition >= 100} onClick={() => act(maintain)}>
+                <button className="tool" disabled={sel.condition >= 100 || game.resources.materials < maintenanceCost(sel.type)} onClick={() => act(maintain)}>
                   <b>🔧 Maintain</b>
-                  <small>{sel.condition >= 100 ? 'In perfect shape' : 'No cash cost'}</small>
+                  <small>{sel.condition >= 100 ? 'In perfect shape' : `Restore condition · ${maintenanceCost(sel.type)} materials`}</small>
                 </button>
                 <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
                   <b>💵 Sell</b>
