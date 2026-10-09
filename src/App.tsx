@@ -180,14 +180,14 @@ export default function App() {
                 return (
                   <button key={order.quantity} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => orderMaterials(g, order))}>
                     <b>Order {order.quantity.toLocaleString()}</b>
-                    <small>${cost.toLocaleString()} · ${Math.round(cost / order.quantity).toLocaleString()} per material</small>
+                    <small>${cost.toLocaleString()} · ${Math.round(cost / order.quantity).toLocaleString()} per material · {materialDeliveryTime(game, order)}s</small>
                   </button>
                 )
               })}
             </div>
             <div className="sawmill-option">
               {game.sawmillBuilt ? (
-                <small>🪚 Sawmill built · material prices halved · {materialDeliveryTime(game)}s delivery</small>
+                <small>🪚 Sawmill built · material prices and delivery times halved</small>
               ) : (
                 <button className="tool" disabled={game.money < SAWMILL_COST} onClick={() => setGame(buildSawmill)}>
                   <b>🪚 Build Sawmill</b>
@@ -206,7 +206,7 @@ export default function App() {
             ) : (
               <small className="no-deliveries">No deliveries in transit</small>
             )}
-            <small>Delivery takes {materialDeliveryTime(game)} seconds{game.sawmillBuilt ? ' with the sawmill' : ''}.</small>
+            <small>Delivery time depends on order size{game.sawmillBuilt ? ' and is halved with the sawmill' : ''}.</small>
           </div>
           <div className="panel">
             <h2>Workers</h2>
