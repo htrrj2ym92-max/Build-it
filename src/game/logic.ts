@@ -187,7 +187,9 @@ export function orderMaterials(g: GameState, order: typeof MATERIAL_ORDERS[numbe
   }
 }
 
-const houseRent = (c: Cell) => (c.type && isOwned(c) ? BUILDINGS[c.type].rentPerDay * (1 + c.level / 2) : 0)
+const RENT_MULTIPLIERS = [1, 1.2, 1.6, 2]
+
+const houseRent = (c: Cell) => (c.type && isOwned(c) ? BUILDINGS[c.type].rentPerDay * RENT_MULTIPLIERS[c.level] : 0)
 
 export const rentalIncome = (g: GameState) => g.grid.reduce((sum, c) => sum + houseRent(c), 0)
 
