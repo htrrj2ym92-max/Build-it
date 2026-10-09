@@ -41,7 +41,7 @@ export function build(g: GameState, index: number, type: BuildingType): GameStat
   const resources = { ...g.resources }
   resources.materials -= BUILDINGS[type].cost
   const grid = g.grid.slice()
-  grid[index] = { ...emptyCell(true), type, remaining: BUILDINGS[type].buildTime }
+  grid[index] = { ...emptyCell(true), type, remaining: BUILDINGS[type].buildTime, taskDuration: BUILDINGS[type].buildTime }
   return { ...g, resources, grid }
 }
 
@@ -79,10 +79,16 @@ const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, gain = 0
 export function upgrade(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell || !cell.type || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
+  if (busyBuilders(g) + BUILDINGS[cell.type].workers > builders(g)) return g
   const materials = upgradeCost(cell.type, cell.level)
   if (g.resources.materials < materials) return g
   const grid = g.grid.slice()
-  grid[index] = { ...cell, level: cell.level + 1 }
+  grid[index] = {
+    ...cell,
+    remaining: BUILDINGS[cell.type].upgradeTime,
+    taskDuration: BUILDINGS[cell.type].upgradeTime,
+    upgradePending: true,
+  }
   return {
     ...g,
     resources: { ...g.resources, materials: g.resources.materials - materials },
@@ -216,12 +222,17 @@ export function tick(g: GameState): GameState {
   const resources = { ...g.resources }
   const ticks = g.ticks + 1
   const decay = ticks % CONDITION_DECAY_TICKS === 0
-  const grid: Cell[] = g.grid.map((c) =>
-    c.type && c.remaining > 0
-      ? { ...c, remaining: Math.max(0, c.remaining - 1) }
-      : decay && isOwned(c) && c.condition > 0
-        ? { ...c, condition: c.condition - 1 }
-        : c)
+  const grid: Cell[] = g.grid.map((c) => {
+    if (c.type && c.remaining > 0) {
+      const remaining = Math.max(0, c.remaining - 1)
+      return remaining === 0
+        ? { ...c, remaining, taskDuration: undefined, upgradePending: false, level: c.level + (c.upgradePending ? 1 : 0) }
+        : { ...c, remaining }
+    }
+    return decay && isOwned(c) && c.condition > 0
+      ? { ...c, condition: c.condition - 1 }
+      : c
+  })
   const rent = ticks % TICKS_PER_DAY === 0 ? rentalIncome({ ...g, grid }) : 0
   const next = { ...g, resources, money: g.money + rent, grid, ticks }
   return { ...next, won: goalProgress(next).every((i) => i.have >= i.need) }
@@ -245,6 +256,8 @@ export function isValid(s: unknown): s is GameState {
     (g.sawmillBuilt === undefined || typeof g.sawmillBuilt === 'boolean') &&
     g.grid.every((c) => c && (c.type === null || c.type in BUILDINGS) && typeof c.lotOwned === 'boolean' && typeof c.remaining === 'number' &&
       (c.level === undefined || (Number.isInteger(c.level) && c.level >= 0 && c.level <= MAX_UPGRADE)) &&
+      (c.taskDuration === undefined || (Number.isFinite(c.taskDuration) && c.taskDuration > 0)) &&
+      (c.upgradePending === undefined || typeof c.upgradePending === 'boolean') &&
       (c.painted === undefined || typeof c.painted === 'boolean') &&
       (c.paintColor === undefined || PAINT_COLORS.some(({ id }) => id === c.paintColor)) &&
       (c.landscaped === undefined || typeof c.landscaped === 'boolean') &&

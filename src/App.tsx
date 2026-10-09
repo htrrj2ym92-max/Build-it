@@ -124,7 +124,7 @@ export default function App() {
               key={i}
               className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : c.lotOwned ? '' : ' unowned')}
               onClick={() => onCell(i)}
-              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, construction in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
+              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, ${c.upgradePending ? 'upgrade' : 'construction'} in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
             >
               <LotArt owned={c.lotOwned} built={!!c.type} />
               {c.type && (
@@ -132,17 +132,19 @@ export default function App() {
                   type={c.type}
                   level={c.level}
                   paintColor={c.paintColor}
-                  progress={c.remaining > 0 ? (BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime : 1}
+                  progress={c.remaining > 0 ? ((c.taskDuration ?? BUILDINGS[c.type].buildTime) - c.remaining) / (c.taskDuration ?? BUILDINGS[c.type].buildTime) : 1}
                 />
               )}
               {c.sold && <span className="timer sold-tag">Sold</span>}
               {c.type && c.remaining > 0 && (
                 <span className="timer">
-                  {(BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime < 0.25
-                    ? 'Foundation'
-                    : (BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime < 0.55
-                      ? 'Building'
-                      : 'Nearly complete'} · {c.remaining}s
+                  {c.upgradePending
+                    ? `Upgrading · ${c.remaining}s`
+                    : ((c.taskDuration ?? BUILDINGS[c.type].buildTime) - c.remaining) / (c.taskDuration ?? BUILDINGS[c.type].buildTime) < 0.25
+                      ? 'Foundation'
+                      : ((c.taskDuration ?? BUILDINGS[c.type].buildTime) - c.remaining) / (c.taskDuration ?? BUILDINGS[c.type].buildTime) < 0.55
+                        ? 'Building'
+                        : 'Nearly complete'}{!c.upgradePending && ` · ${c.remaining}s`}
                 </span>
               )}
             </button>
@@ -253,7 +255,7 @@ export default function App() {
           <div className="modal build-modal" role="dialog" aria-modal="true" aria-labelledby="manage-title" onClick={(event) => event.stopPropagation()}>
             <h2 id="manage-title">{BUILDINGS[sel.type].icon} {BUILDINGS[sel.type].name}</h2>
             <div className="manage-art"><BuildingArt type={sel.type} level={sel.level} paintColor={sel.paintColor} /></div>
-            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.painted ? ` · Painted ${PAINT_COLORS.find(({ id }) => id === sel.paintColor)?.name ?? PAINT_COLORS[0].name}` : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
+            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.upgradePending ? ` · Upgrading (${sel.remaining}s left)` : ''}{sel.painted ? ` · Painted ${PAINT_COLORS.find(({ id }) => id === sel.paintColor)?.name ?? PAINT_COLORS[0].name}` : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
             <p>Current value: ${houseValue(sel).toLocaleString()}</p>
             {sel.sold ? (
               <p>This property was sold and no longer earns you income.</p>
@@ -272,19 +274,19 @@ export default function App() {
                     {name}
                   </button>
                 ))}
-                <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level)} onClick={() => act(upgrade)}>
+                <button className="tool" disabled={sel.remaining > 0 || sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level) || free < BUILDINGS[sel.type].workers} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
-                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · No cash cost`}</small>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · ${BUILDINGS[sel.type].upgradeTime}s · ${BUILDINGS[sel.type].workers} workers`}</small>
                 </button>
-                <button className="tool" disabled={sel.painted || game.resources.materials < improvementCost(sel.type)} onClick={() => act(paintBuilding)}>
+                <button className="tool" disabled={sel.remaining > 0 || sel.painted || game.resources.materials < improvementCost(sel.type)} onClick={() => act(paintBuilding)}>
                   <b>🎨 Paint</b>
                   <small>{sel.painted ? 'Already painted' : `+5% value · ${improvementCost(sel.type)} materials`}</small>
                 </button>
-                <button className="tool" disabled={sel.landscaped || game.resources.materials < improvementCost(sel.type)} onClick={() => act(landscape)}>
+                <button className="tool" disabled={sel.remaining > 0 || sel.landscaped || game.resources.materials < improvementCost(sel.type)} onClick={() => act(landscape)}>
                   <b>🌿 Landscape</b>
                   <small>{sel.landscaped ? 'Already landscaped' : `+5% value · ${improvementCost(sel.type)} materials`}</small>
                 </button>
-                <button className="tool" disabled={sel.condition >= 100 || game.resources.materials < maintenanceCost(sel.type)} onClick={() => act(maintain)}>
+                <button className="tool" disabled={sel.remaining > 0 || sel.condition >= 100 || game.resources.materials < maintenanceCost(sel.type)} onClick={() => act(maintain)}>
                   <b>🔧 Maintain</b>
                   <small>{sel.condition >= 100 ? 'In perfect shape' : `Restore condition · ${maintenanceCost(sel.type)} materials`}</small>
                 </button>
