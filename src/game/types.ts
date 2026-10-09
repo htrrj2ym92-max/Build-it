@@ -17,6 +17,8 @@ export interface Cell {
   level: number
   /** 0..100, decays over time; restored by maintenance */
   condition: number
+  painted: boolean
+  landscaped: boolean
   /** sold to someone else: stays on the lot but no longer owned */
   sold: boolean
 }

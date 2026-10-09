@@ -3,7 +3,7 @@ import type { BuildingType, Cell, GameState } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
 
-export const emptyCell = (lotOwned = false): Cell => ({ type: null, lotOwned, remaining: 0, level: 0, condition: 100, sold: false })
+export const emptyCell = (lotOwned = false): Cell => ({ type: null, lotOwned, remaining: 0, level: 0, condition: 100, painted: false, landscaped: false, sold: false })
 
 /** a finished building the player still owns */
 export const isOwned = (c: Cell) => !!c.type && c.remaining === 0 && !c.sold
@@ -66,7 +66,7 @@ export function demolish(g: GameState, index: number): GameState {
 export const salePrice = (cell: Cell) => {
   if (!cell.type) return 0
   let value = BUILDINGS[cell.type].cashCost
-  for (let l = 0; l < cell.level; l++) value += Math.round(BUILDINGS[cell.type].cashCost * 0.5 * (l + 1))
+  value *= 1 + cell.level * 0.1 + (cell.landscaped ? 0.05 : 0) + (cell.painted ? 0.05 : 0)
   return Math.floor(value * 0.7 * (0.5 + 0.5 * cell.condition / 100))
 }
 
@@ -78,8 +78,28 @@ const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, gain = 0
 
 export function upgrade(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
-  return updateCell(g, index, (c) => ({ ...c, level: c.level + 1 }))
+  if (!cell || !cell.type || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
+  const materials = BUILDINGS[cell.type].cost
+  if (g.resources.materials < materials) return g
+  const grid = g.grid.slice()
+  grid[index] = { ...cell, level: cell.level + 1 }
+  return {
+    ...g,
+    resources: { ...g.resources, materials: g.resources.materials - materials },
+    grid,
+  }
+}
+
+export function landscape(g: GameState, index: number): GameState {
+  const cell = g.grid[index]
+  if (!cell || !isOwned(cell) || cell.landscaped) return g
+  return updateCell(g, index, (c) => ({ ...c, landscaped: true }))
+}
+
+export function paintBuilding(g: GameState, index: number): GameState {
+  const cell = g.grid[index]
+  if (!cell || !isOwned(cell) || cell.painted) return g
+  return updateCell(g, index, (c) => ({ ...c, painted: true }))
 }
 
 export function maintain(g: GameState, index: number): GameState {
@@ -196,6 +216,8 @@ export function isValid(s: unknown): s is GameState {
     (g.sawmillBuilt === undefined || typeof g.sawmillBuilt === 'boolean') &&
     g.grid.every((c) => c && (c.type === null || c.type in BUILDINGS) && typeof c.lotOwned === 'boolean' && typeof c.remaining === 'number' &&
       (c.level === undefined || (Number.isInteger(c.level) && c.level >= 0 && c.level <= MAX_UPGRADE)) &&
+      (c.painted === undefined || typeof c.painted === 'boolean') &&
+      (c.landscaped === undefined || typeof c.landscaped === 'boolean') &&
       (c.condition === undefined || (typeof c.condition === 'number' && c.condition >= 0 && c.condition <= 100)))
   )
 }
