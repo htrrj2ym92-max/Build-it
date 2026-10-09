@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, changePaintColor, demolish, gather, goalProgress, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, changePaintColor, demolish, goalProgress, hasSawmill, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -151,7 +151,6 @@ export default function App() {
           ))}
         </section>
         <div className="dock" role="toolbar" aria-label="Quick actions">
-          <button className="dock-btn materials" onClick={() => setGame(gather)}><span>🧱</span>Gather materials</button>
           <button className={'dock-btn danger' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}><span>💥</span>{tool === 'demolish' ? 'Tap building' : 'Demolish'}</button>
           <button className="dock-btn" onClick={() => setPaused((value) => !value)} aria-pressed={paused}><span>{paused ? '▶' : '⏸'}</span>{paused ? 'Resume' : 'Pause'}</button>
         </div>
@@ -178,7 +177,7 @@ export default function App() {
             <div className="material-inventory"><span>🧱 Materials <b>{Math.floor(game.resources.materials)}</b></span></div>
             <div className="tools">
               {MATERIAL_ORDERS.map((order) => {
-                const cost = game.sawmillBuilt ? Math.floor(order.cost / 2) : order.cost
+                const cost = hasSawmill(game) ? Math.floor(order.cost / 2) : order.cost
                 return (
                   <button key={order.quantity} className="tool" disabled={game.money < cost} onClick={() => setGame((g) => orderMaterials(g, order))}>
                     <b>Order {order.quantity.toLocaleString()}</b>
@@ -187,14 +186,6 @@ export default function App() {
                 )
               })}
             </div>
-            {!game.sawmillBuilt && (
-              <div className="sawmill-option">
-                <button className="tool" disabled={game.money < SAWMILL_COST} onClick={() => setGame(buildSawmill)}>
-                  <b>🪚 Build Sawmill</b>
-                  <small>${SAWMILL_COST.toLocaleString()} · halves material prices and delivery time</small>
-                </button>
-              </div>
-            )}
             {game.deliveries.length > 0 && (
               <ul className="deliveries" aria-label="Incoming material deliveries">
                 {game.deliveries.map((delivery, index) => (
@@ -207,7 +198,7 @@ export default function App() {
           </div>
           <div className="panel">
             <h2>Workers</h2>
-            <small className="hint">Homes require the listed number of workers while under construction.</small>
+            <small className="hint">Buildings require the listed number of workers while under construction.</small>
             <div className="tools">
               {WORKER_HIRE_COSTS.map((_, index) => {
                 const workers = index + 1
@@ -223,7 +214,7 @@ export default function App() {
           </div>
           <div className="panel">
             <h2>Buildings guide</h2>
-            <small className="hint">Buy a lot for ${LOT_COST.toLocaleString()}, then choose a home.</small>
+            <small className="hint">Buy a lot for ${LOT_COST.toLocaleString()}, then choose a building.</small>
             <div className="tools">
               {BUILDING_ORDER.map((t) => {
                 const def = BUILDINGS[t]
@@ -319,7 +310,7 @@ export default function App() {
               </>
             ) : (
               <>
-                <h2 id="build-title">Choose a home</h2>
+                <h2 id="build-title">Choose a building</h2>
                 <p>Lot {selectedLot + 1} · {free > 0 ? `${free} worker${free === 1 ? '' : 's'} available` : 'No workers available'}</p>
                 <div className="build-options">
                   {BUILDING_ORDER.map((type) => {

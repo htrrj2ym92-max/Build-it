@@ -19,9 +19,11 @@ export const BUILDINGS: Record<BuildingType, BuildingDef> = {
   estate: { name: 'Estate', icon: '🏛️', cost: 600, cashCost: 240000, workers: 5, rentPerDay: 6000, buildTime: 16, upgradeTime: 8, desc: 'High-value upscale residence · $6,000/day rent' },
   mansion: { name: 'Mansion', icon: '🏰', cost: 1200, cashCost: 600000, workers: 7, rentPerDay: 15000, buildTime: 18, upgradeTime: 9, desc: 'Luxury premium property · $15,000/day rent' },
   castle: { name: 'Castle', icon: '🏯', cost: 2500, cashCost: 1200000, workers: 9, rentPerDay: 25000, buildTime: 20, upgradeTime: 10, desc: 'Ultimate high-rent property · $25,000/day rent' },
+  workshop: { name: 'Workshop', icon: '🛠️', cost: 900, cashCost: 0, workers: 3, rentPerDay: 0, buildTime: 15, upgradeTime: 7, desc: 'Utility building · no rental income' },
+  sawmill: { name: 'Sawmill', icon: '🪚', cost: 1250, cashCost: 0, workers: 5, rentPerDay: 0, buildTime: 18, upgradeTime: 9, desc: 'Halves material prices and delivery times' },
 }
 
-export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', 'estate', 'mansion', 'castle']
+export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', 'estate', 'mansion', 'castle', 'workshop', 'sawmill']
 export const PAINT_COLORS: { id: PaintColor; name: string; value: string; hue: number }[] = [
   { id: 'red', name: 'Red', value: '#d95d4c', hue: 0 },
   { id: 'blue', name: 'Blue', value: '#4387bd', hue: 200 },
@@ -45,12 +47,10 @@ export const LEVELS: Level[] = [
 export const LOT_COST = 25_000
 export const MAX_UPGRADE = 3
 export const CONDITION_DECAY_TICKS = 10
-export const GATHER_AMOUNT = 5
 export const STARTING_MONEY = 100_000
 export const WORKER_HIRE_COSTS = [50_000, 90_000, 120_000] as const
 export const TICKS_PER_DAY = 60
 export const MATERIAL_DELIVERY_TIME = 15
-export const SAWMILL_COST = 50_000
 export const MATERIAL_ORDERS = [
   { quantity: 100, cost: 10_000, deliveryTime: 5 },
   { quantity: 250, cost: 22_500, deliveryTime: 5 },

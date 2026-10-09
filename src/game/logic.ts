@@ -1,4 +1,4 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, SAWMILL_COST, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import { BUILDINGS, CONDITION_DECAY_TICKS, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
 import type { BuildingType, Cell, GameState, PaintColor } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
@@ -31,6 +31,9 @@ export const canAfford = (g: GameState, type: BuildingType) =>
 
 export const canBuild = (g: GameState, type: BuildingType) =>
   canAfford(g, type) && builders(g) >= BUILDINGS[type].workers
+
+export const hasSawmill = (g: GameState) =>
+  g.sawmillBuilt === true || g.grid.some((cell) => cell.type === 'sawmill' && isOwned(cell))
 
 export const count = (g: GameState, type: BuildingType) =>
   g.grid.filter((c) => c.type === type && isOwned(c)).length
@@ -152,24 +155,14 @@ export function hireWorkers(g: GameState, workers: number): GameState {
   return { ...g, money: g.money - cost, hiredWorkers: (g.hiredWorkers ?? 0) + workers }
 }
 
-export function buildSawmill(g: GameState): GameState {
-  if (g.sawmillBuilt || g.money < SAWMILL_COST) return g
-  return { ...g, money: g.money - SAWMILL_COST, sawmillBuilt: true }
-}
-
 export function sell(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell || !isOwned(cell)) return g
   return updateCell(g, index, (c) => ({ ...c, sold: true }), houseValue(cell))
 }
 
-export const gather = (g: GameState): GameState => ({
-  ...g,
-  resources: { ...g.resources, materials: g.resources.materials + GATHER_AMOUNT },
-})
-
 export const materialDeliveryTime = (g: GameState, order: typeof MATERIAL_ORDERS[number]) =>
-  g.sawmillBuilt ? order.deliveryTime / 2 : order.deliveryTime
+  hasSawmill(g) ? order.deliveryTime / 2 : order.deliveryTime
 
 export function advanceDeliveries(g: GameState): GameState {
   const resources = { ...g.resources }
@@ -187,7 +180,7 @@ export function advanceDeliveries(g: GameState): GameState {
 }
 
 export function orderMaterials(g: GameState, order: typeof MATERIAL_ORDERS[number]): GameState {
-  const cost = g.sawmillBuilt ? Math.floor(order.cost / 2) : order.cost
+  const cost = hasSawmill(g) ? Math.floor(order.cost / 2) : order.cost
   if (g.money < cost) return g
   const duration = materialDeliveryTime(g, order)
   return {

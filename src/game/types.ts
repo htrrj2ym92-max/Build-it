@@ -1,6 +1,6 @@
 export type Resource = 'materials'
 export type Resources = Record<Resource, number>
-export type BuildingType = 'rambler' | 'colonial' | 'tudor' | 'estate' | 'mansion' | 'castle'
+export type BuildingType = 'rambler' | 'colonial' | 'tudor' | 'estate' | 'mansion' | 'castle' | 'workshop' | 'sawmill'
 export type PaintColor = 'red' | 'blue' | 'green' | 'yellow'
 
 export interface MaterialDelivery {
