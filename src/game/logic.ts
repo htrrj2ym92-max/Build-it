@@ -1,5 +1,5 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
-import type { BuildingType, Cell, GameState } from './types'
+import { BUILDINGS, CONDITION_DECAY_TICKS, GATHER_AMOUNT, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, SAWMILL_COST, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import type { BuildingType, Cell, GameState, PaintColor } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
 
@@ -63,12 +63,12 @@ export function demolish(g: GameState, index: number): GameState {
   return { ...g, resources, grid }
 }
 
-export const salePrice = (cell: Cell) => {
+export const houseValue = (cell: Cell) => {
   if (!cell.type) return 0
-  let value = BUILDINGS[cell.type].cashCost
-  value *= 1 + cell.level * 0.1 + (cell.landscaped ? 0.05 : 0) + (cell.painted ? 0.05 : 0)
-  return Math.floor(value * 0.7 * (0.5 + 0.5 * cell.condition / 100))
+  return BUILDINGS[cell.type].cashCost * (1 + cell.level * 0.1 + (cell.landscaped ? 0.05 : 0) + (cell.painted ? 0.05 : 0))
 }
+
+export const salePrice = houseValue
 
 const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, gain = 0): GameState => {
   const grid = g.grid.slice()
@@ -103,14 +103,22 @@ export function landscape(g: GameState, index: number): GameState {
   return { ...g, resources: { ...g.resources, materials: g.resources.materials - cost }, grid }
 }
 
-export function paintBuilding(g: GameState, index: number): GameState {
+export function paintBuilding(g: GameState, index: number, color: PaintColor = PAINT_COLORS[0].id): GameState {
   const cell = g.grid[index]
   if (!cell?.type || !isOwned(cell) || cell.painted) return g
   const cost = improvementCost(cell.type)
   if (g.resources.materials < cost) return g
   const grid = g.grid.slice()
-  grid[index] = { ...cell, painted: true }
+  grid[index] = { ...cell, painted: true, paintColor: color }
   return { ...g, resources: { ...g.resources, materials: g.resources.materials - cost }, grid }
+}
+
+export function changePaintColor(g: GameState, index: number, color: PaintColor): GameState {
+  const cell = g.grid[index]
+  if (!cell?.type || !isOwned(cell) || !cell.painted || cell.paintColor === color) return g
+  const grid = g.grid.slice()
+  grid[index] = { ...cell, paintColor: color }
+  return { ...g, grid }
 }
 
 export const improvementCost = (type: BuildingType) => Math.floor(BUILDINGS[type].cost / 10)
@@ -146,7 +154,7 @@ export function buildSawmill(g: GameState): GameState {
 export function sell(g: GameState, index: number): GameState {
   const cell = g.grid[index]
   if (!cell || !isOwned(cell)) return g
-  return updateCell(g, index, (c) => ({ ...c, sold: true }), salePrice(cell))
+  return updateCell(g, index, (c) => ({ ...c, sold: true }), houseValue(cell))
 }
 
 export const gather = (g: GameState): GameState => ({
@@ -238,6 +246,7 @@ export function isValid(s: unknown): s is GameState {
     g.grid.every((c) => c && (c.type === null || c.type in BUILDINGS) && typeof c.lotOwned === 'boolean' && typeof c.remaining === 'number' &&
       (c.level === undefined || (Number.isInteger(c.level) && c.level >= 0 && c.level <= MAX_UPGRADE)) &&
       (c.painted === undefined || typeof c.painted === 'boolean') &&
+      (c.paintColor === undefined || PAINT_COLORS.some(({ id }) => id === c.paintColor)) &&
       (c.landscaped === undefined || typeof c.landscaped === 'boolean') &&
       (c.condition === undefined || (typeof c.condition === 'number' && c.condition >= 0 && c.condition <= 100)))
   )

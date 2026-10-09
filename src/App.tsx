@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, SAWMILL_COST, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, demolish, gather, goalProgress, hireWorkers, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, salePrice, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, buildSawmill, builders, busyBuilders, buyLot, canBuild, changePaintColor, demolish, gather, goalProgress, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState } from './game/types'
 
@@ -131,6 +131,7 @@ export default function App() {
                 <BuildingArt
                   type={c.type}
                   level={c.level}
+                  paintColor={c.paintColor}
                   progress={c.remaining > 0 ? (BUILDINGS[c.type].buildTime - c.remaining) / BUILDINGS[c.type].buildTime : 1}
                 />
               )}
@@ -251,12 +252,26 @@ export default function App() {
         <div className="overlay" onClick={() => setSelectedBuilding(null)}>
           <div className="modal build-modal" role="dialog" aria-modal="true" aria-labelledby="manage-title" onClick={(event) => event.stopPropagation()}>
             <h2 id="manage-title">{BUILDINGS[sel.type].icon} {BUILDINGS[sel.type].name}</h2>
-            <div className="manage-art"><BuildingArt type={sel.type} level={sel.level} /></div>
-            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.painted ? ' · Painted' : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
+            <div className="manage-art"><BuildingArt type={sel.type} level={sel.level} paintColor={sel.paintColor} /></div>
+            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.painted ? ` · Painted ${PAINT_COLORS.find(({ id }) => id === sel.paintColor)?.name ?? PAINT_COLORS[0].name}` : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
+            <p>Current value: ${houseValue(sel).toLocaleString()}</p>
             {sel.sold ? (
               <p>This property was sold and no longer earns you income.</p>
             ) : (
               <div className="build-options">
+                {sel.painted && PAINT_COLORS.map(({ id, name, value }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-label={`Change paint color to ${name}`}
+                    aria-pressed={sel.paintColor === id}
+                    title={`Change paint color to ${name}`}
+                    onClick={() => act((g, i) => changePaintColor(g, i, id))}
+                    style={{ backgroundColor: value, outline: sel.paintColor === id ? '3px solid #2b3a1f' : undefined }}
+                  >
+                    {name}
+                  </button>
+                ))}
                 <button className="tool" disabled={sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level)} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
                   <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · No cash cost`}</small>
@@ -275,7 +290,7 @@ export default function App() {
                 </button>
                 <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
                   <b>💵 Sell</b>
-                  <small>Get ${salePrice(sel).toLocaleString()}</small>
+                  <small>Receive full value: ${houseValue(sel).toLocaleString()}</small>
                 </button>
                 <button className="tool" onClick={() => act(demolish, true)}>
                   <b>💥 Demolish</b>

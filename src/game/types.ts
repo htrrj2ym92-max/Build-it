@@ -1,6 +1,7 @@
 export type Resource = 'materials'
 export type Resources = Record<Resource, number>
 export type BuildingType = 'rambler' | 'colonial' | 'tudor' | 'estate' | 'mansion' | 'castle'
+export type PaintColor = 'red' | 'blue' | 'green' | 'yellow'
 
 export interface MaterialDelivery {
   quantity: number
@@ -18,6 +19,7 @@ export interface Cell {
   /** 0..100, decays over time; restored by maintenance */
   condition: number
   painted: boolean
+  paintColor?: PaintColor
   landscaped: boolean
   /** sold to someone else: stays on the lot but no longer owned */
   sold: boolean
