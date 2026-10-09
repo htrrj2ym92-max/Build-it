@@ -192,7 +192,7 @@ export default function App() {
                 </button>
               </div>
             )}
-            {game.deliveries.length > 0 ? (
+            {game.deliveries.length > 0 && (
               <ul className="deliveries" aria-label="Incoming material deliveries">
                 {game.deliveries.map((delivery, index) => (
                   <li key={index}>
