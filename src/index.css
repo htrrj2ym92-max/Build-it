@@ -32,7 +32,6 @@ ul { margin: 0; padding-left: 18px; } li.done { color: var(--accent); text-decor
 .build-options .tool { min-height: 76px; }
 .build-options .tool:disabled { cursor: not-allowed; }
 .cancel-build { margin-top: 10px; background: #66745b; }
-.gather { width: 100%; margin-top: 8px; background: #8a5a2b; }
 .overlay { position: fixed; inset: 0; background: #0008; display: grid; place-items: center; padding: 16px; }
 .modal { background: #fff; border-radius: 14px; padding: 20px; text-align: center; max-width: 340px; }
 .cell.sold svg { filter: grayscale(1) drop-shadow(0 3px 2px #38563835); }
@@ -65,17 +64,13 @@ header button { background: #6b7d5f; }
 .cell:not(.built):not(.building)::after { content: '+'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 2rem; font-weight: 700; color: #ffffff99; }
 .cell.unowned { background: linear-gradient(145deg,#b5c79a,#8ca477); border-style: dashed; }
 .cell.built, .cell.building { overflow: visible; z-index: 1; }
-.dock { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px auto 4px; max-width: min(100%, 70vh); }
+.dock { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 18px auto 4px; max-width: min(100%, 70vh); }
 .dock-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 60px; font-weight: 700; background: linear-gradient(#5f9a3a,#3f7a28); border-bottom: 4px solid #2c571d; border-radius: 14px; }
 .dock-btn span { font-size: 1.4rem; line-height: 1; }
-.dock-btn.materials { background: linear-gradient(#7e9a6a,#5d7949); border-bottom-color: #405633; }
 .dock-btn.danger { background: linear-gradient(#d9694f,#b44a35); border-bottom-color: #7e2f21; }
 .dock-btn.active { outline: 3px solid #f6d77a; }
 .delivery-tracker { width: min(100%, 70vh); height: 20px; margin: 8px auto 0; overflow: hidden; border: 2px solid #668b48; border-radius: 999px; background: #e7f2bd; box-shadow: 0 2px 6px #344b2b22; }
 .delivery-progress-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#8abd58,#4a7c2a); transition: width .5s linear; }
-.sawmill-option { margin-top: 8px; }
-.sawmill-option .tool { width: 100%; }
-.sawmill-option > small { display: block; color: #315b20; font-weight: 700; }
 .panel { border: 2px solid #f6f4d8; border-radius: 14px; }
 .panel h2 { color: #3f6b2a; }
 .tool { min-height: 52px; border-radius: 12px; }

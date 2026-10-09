@@ -113,13 +113,15 @@ const art: Record<string, ReactNode> = {
   ),
 }
 
-const homeArt: Record<BuildingType, ReactNode> = {
+const buildingArt: Record<BuildingType, ReactNode> = {
   rambler: art.house,
   colonial: art.market,
   tudor: art.workshop,
   estate: art.hut,
   mansion: art.tower,
   castle: art.castle,
+  workshop: art.workshop,
+  sawmill: art.lumber,
 }
 
 export default function BuildingArt({ type, progress = 1, level = 0, paintColor }: { type: BuildingType; progress?: number; level?: number; paintColor?: PaintColor }) {
@@ -133,6 +135,8 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
     estate: '#bda47c',
     mansion: '#aeb8b5',
     castle: '#aeb8b5',
+    workshop: '#bd9a6e',
+    sawmill: '#bd9a6e',
   }
 
   return (
@@ -154,7 +158,7 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
               <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
             </clipPath>
           </defs>
-          <g clipPath={`url(#${clipId})`} style={paintColor ? { filter: `hue-rotate(${paintHue}deg)` } : undefined}>{homeArt[type]}</g>
+          <g clipPath={`url(#${clipId})`} style={paintColor ? { filter: `hue-rotate(${paintHue}deg)` } : undefined}>{buildingArt[type]}</g>
           {progress >= 1 && level >= 1 && (
             <>
               <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />
