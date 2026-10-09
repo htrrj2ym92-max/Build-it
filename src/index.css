@@ -22,7 +22,6 @@ main { display: grid; gap: 10px; grid-template-columns: 1fr; }
 .panel { background: var(--card); box-shadow: 0 2px 6px #344b2b22; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
 .material-inventory { display: flex; justify-content: space-between; margin: 8px 0; }
 .deliveries { margin: 8px 0 4px; padding-left: 18px; font-size: .85rem; }
-.no-deliveries { display: block; margin: 8px 0 4px; }
 ul { margin: 0; padding-left: 18px; } li.done { color: var(--accent); text-decoration: line-through; }
 .tools { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
 .tool { display: flex; flex-direction: column; align-items: flex-start; text-align: left; background: #eef3e6; color: var(--ink); gap: 2px; border: 2px solid transparent; }
