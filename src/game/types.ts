@@ -14,6 +14,8 @@ export interface Cell {
   lotOwned: boolean
   /** seconds of construction left; 0 = finished */
   remaining: number
+  taskDuration?: number
+  upgradePending?: boolean
   /** upgrade level, 0..MAX_LEVEL */
   level: number
   /** 0..100, decays over time; restored by maintenance */
