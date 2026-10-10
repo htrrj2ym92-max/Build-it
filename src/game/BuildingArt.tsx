@@ -10,6 +10,21 @@ import type { BuildingType, PaintColor } from './types'
 
 const ramblerPhases = [ramblerPhase1, ramblerPhase2, ramblerPhase3, ramblerPhase4, ramblerPhase5]
 
+// Vertical extent (% of the rambler image) of the wall mask, used to band the paint reveal
+const RAMBLER_WALL_TOP = 49.6
+const RAMBLER_WALL_BOTTOM = 92.2
+
+// Approximate vertical extent (SVG y) of the exterior walls for each drawn building
+const wallExtent: Partial<Record<BuildingType, [number, number]>> = {
+  colonial: [32, 100],
+  tudor: [32, 101],
+  estate: [34, 99],
+  mansion: [29, 101],
+  castle: [31, 108],
+  workshop: [32, 101],
+  sawmill: [36, 100],
+}
+
 const makeArt = (w: { light?: string; dark?: string }): Record<string, ReactNode> => ({
   house: (
     <>
@@ -161,11 +176,14 @@ const buildingArt = (art: Record<string, ReactNode>): Record<BuildingType, React
   sawmill: art.lumber,
 })
 
-export default function BuildingArt({ type, progress = 1, level = 0, paintColor }: { type: BuildingType; progress?: number; level?: number; paintColor?: PaintColor }) {
+export default function BuildingArt({ type, progress = 1, level = 0, paintColor, paintingColor, paintStage = 0 }: { type: BuildingType; progress?: number; level?: number; paintColor?: PaintColor; paintingColor?: PaintColor; paintStage?: number }) {
   const clipId = useId().replace(/:/g, '')
   const reveal = progress >= 1 ? 1 : progress < 0.25 ? 0 : progress < 0.55 ? 0.52 : 0.88
   const paint = PAINT_COLORS.find(({ id }) => id === paintColor)
+  const newPaint = paintStage > 0 ? PAINT_COLORS.find(({ id }) => id === paintingColor) : undefined
+  const bandFraction = newPaint ? paintStage * 0.25 : 0
   const shownArt = buildingArt(makeArt(paint ? { light: paint.value, dark: paint.dark } : {}))
+  const paintedArt = newPaint ? buildingArt(makeArt({ light: newPaint.value, dark: newPaint.dark })) : undefined
   const foundationColors: Record<BuildingType, string> = {
     rambler: '#d8b982',
     colonial: '#d7c69d',
@@ -181,13 +199,26 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
     const phase = progress >= 1 ? 4 : Math.min(3, Math.floor(Math.max(0, progress) * 4))
     return (
       <div className="rambler-art" aria-hidden="true">
-        <img src={ramblerPhases[phase]} alt="" />
-        {paint && phase === 4 && (
-          <div
-            className="rambler-paint"
-            style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${ramblerWallMask})`, maskImage: `url(${ramblerWallMask})` }}
-          />
-        )}
+        <div className="rambler-stage">
+          <img src={ramblerPhases[phase]} alt="" />
+          {paint && phase === 4 && (
+            <div
+              className="rambler-paint"
+              style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${ramblerWallMask})`, maskImage: `url(${ramblerWallMask})` }}
+            />
+          )}
+          {newPaint && phase === 4 && (
+            <div
+              className="rambler-paint"
+              style={{
+                backgroundColor: newPaint.value,
+                WebkitMaskImage: `url(${ramblerWallMask})`,
+                maskImage: `url(${ramblerWallMask})`,
+                clipPath: `inset(${RAMBLER_WALL_BOTTOM - bandFraction * (RAMBLER_WALL_BOTTOM - RAMBLER_WALL_TOP)}% 0 0 0)`,
+              }}
+            />
+          )}
+        </div>
       </div>
     )
   }
@@ -212,6 +243,16 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
             </clipPath>
           </defs>
           <g clipPath={`url(#${clipId})`} >{shownArt[type]}</g>
+          {paintedArt && (
+            <>
+              <defs>
+                <clipPath id={`${clipId}-paint`}>
+                  <rect x="0" y={(wallExtent[type]?.[1] ?? 100) - bandFraction * ((wallExtent[type]?.[1] ?? 100) - (wallExtent[type]?.[0] ?? 32))} width="120" height="110" />
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#${clipId}-paint)`}>{paintedArt[type]}</g>
+            </>
+          )}
           {progress >= 1 && level >= 1 && (
             <>
               <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />

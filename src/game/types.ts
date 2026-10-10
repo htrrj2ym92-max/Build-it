@@ -22,6 +22,10 @@ export interface Cell {
   condition: number
   painted: boolean
   paintColor?: PaintColor
+  /** colour being applied while a paint job is in progress */
+  paintingColor?: PaintColor
+  paintRemaining?: number
+  paintDuration?: number
   landscaped: boolean
   /** sold to someone else: stays on the lot but no longer owned */
   sold: boolean
