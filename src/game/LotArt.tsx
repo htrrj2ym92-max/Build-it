@@ -2,13 +2,14 @@ const CORNERS: [number, number][] = [[14, 30], [86, 30], [8, 78], [92, 78]]
 
 const CONSTRUCTION_GROUNDS = ['#a77a4f', '#b4a078', '#a29a78', '#9fc273']
 
-export default function LotArt({ owned, built, phase, landscaped = false }: { owned: boolean; built: boolean; phase?: number; landscaped?: boolean }) {
+export default function LotArt({ owned, built, phase, constructionInProgress, landscaped = false }: { owned: boolean; built: boolean; phase?: number; constructionInProgress: boolean; landscaped?: boolean }) {
   const post = owned ? '#f1a53e' : '#d95d4c'
   const constructing = phase !== undefined
+  const showLotSquare = !built || constructionInProgress
   const ground = constructing ? CONSTRUCTION_GROUNDS[phase - 1] : built ? '#8fcb5f' : owned ? '#8fcb5f' : '#a2b48b'
   return (
     <svg className="lot-art" viewBox="0 0 100 100" aria-hidden="true" preserveAspectRatio="none">
-      <path fill={ground} stroke="#e7f2bd" strokeWidth="2" strokeLinejoin="round" d="M14 30 86 30 92 78 8 78Z" />
+      {showLotSquare && <path fill={ground} stroke="#e7f2bd" strokeWidth="2" strokeLinejoin="round" d="M14 30 86 30 92 78 8 78Z" />}
       {!built && <path fill="none" stroke={owned ? '#f6f4d8' : '#fff'} strokeWidth="1.6" strokeDasharray="4 3" strokeLinejoin="round" d="M20 36 80 36 85 72 15 72Z" />}
       {constructing && phase === 1 && (
         <g fill="#795a3d" opacity=".55">
