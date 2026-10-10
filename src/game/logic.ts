@@ -117,20 +117,12 @@ export function landscape(g: GameState, index: number): GameState {
 
 export function paintBuilding(g: GameState, index: number, color: PaintColor = PAINT_COLORS[0].id): GameState {
   const cell = g.grid[index]
-  if (!cell?.type || !isOwned(cell) || cell.painted) return g
+  if (!cell?.type || !isOwned(cell) || cell.remaining > 0 || (cell.painted && cell.paintColor === color)) return g
   const cost = improvementCost(cell.type)
   if (g.resources.materials < cost) return g
   const grid = g.grid.slice()
   grid[index] = { ...cell, painted: true, paintColor: color }
   return { ...g, resources: { ...g.resources, materials: g.resources.materials - cost }, grid }
-}
-
-export function changePaintColor(g: GameState, index: number, color: PaintColor): GameState {
-  const cell = g.grid[index]
-  if (!cell?.type || !isOwned(cell) || !cell.painted || cell.paintColor === color) return g
-  const grid = g.grid.slice()
-  grid[index] = { ...cell, paintColor: color }
-  return { ...g, grid }
 }
 
 export const improvementCost = (type: BuildingType) => Math.floor(BUILDINGS[type].cost / 10)
