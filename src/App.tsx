@@ -87,6 +87,12 @@ export default function App() {
 
   const sel = selectedBuilding !== null ? game.grid[selectedBuilding] : null
 
+  const constructionProgress = (cell: GameState['grid'][number]) => {
+    if (!cell.type || cell.remaining <= 0 || cell.upgradePending) return 1
+    const duration = cell.taskDuration ?? BUILDINGS[cell.type].buildTime
+    return Math.min(1, Math.max(0, (duration - cell.remaining) / duration))
+  }
+
   const costLabel = (type: BuildingType) =>
     `${BUILDINGS[type].cost.toLocaleString()} materials`
 
@@ -119,36 +125,34 @@ export default function App() {
       <main>
         <div className="board-wrap">
         <section className="board" aria-label="Neighborhood building lots" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
-          {game.grid.map((c, i) => (
-            <button
-              key={i}
-              className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : c.lotOwned ? '' : ' unowned')}
-              onClick={() => onCell(i)}
-              aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, ${c.upgradePending ? 'upgrade' : 'construction'} in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
-            >
-              <LotArt owned={c.lotOwned} built={!!c.type} />
-              {c.type && (
-                <BuildingArt
-                  type={c.type}
-                  level={c.level}
-                  paintColor={c.paintColor}
-                  progress={c.remaining > 0 ? ((c.taskDuration ?? BUILDINGS[c.type].buildTime) - c.remaining) / (c.taskDuration ?? BUILDINGS[c.type].buildTime) : 1}
-                />
-              )}
-              {c.sold && <span className="timer sold-tag">Sold</span>}
-              {c.type && c.remaining > 0 && (
-                <span className="timer">
-                  {c.upgradePending
-                    ? `Upgrading · ${c.remaining}s`
-                    : ((c.taskDuration ?? BUILDINGS[c.type].buildTime) - c.remaining) / (c.taskDuration ?? BUILDINGS[c.type].buildTime) < 0.25
-                      ? 'Foundation'
-                      : ((c.taskDuration ?? BUILDINGS[c.type].buildTime) - c.remaining) / (c.taskDuration ?? BUILDINGS[c.type].buildTime) < 0.55
-                        ? 'Building'
-                        : 'Nearly complete'}{!c.upgradePending && ` · ${c.remaining}s`}
-                </span>
-              )}
-            </button>
-          ))}
+          {game.grid.map((c, i) => {
+            const progress = constructionProgress(c)
+            const phase = c.type === 'rambler' && c.remaining > 0 && !c.upgradePending
+              ? Math.min(4, Math.floor(progress * 4) + 1)
+              : undefined
+            return (
+              <button
+                key={i}
+                className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : c.lotOwned ? '' : ' unowned')}
+                onClick={() => onCell(i)}
+                aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, ${c.upgradePending ? 'upgrade' : 'construction'} in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
+              >
+                <LotArt owned={c.lotOwned} built={!!c.type} phase={phase} landscaped={c.landscaped} />
+                {c.type && (
+                  <BuildingArt
+                    type={c.type}
+                    level={c.level}
+                    paintColor={c.paintColor}
+                    progress={progress}
+                  />
+                )}
+                {c.sold && <span className="timer sold-tag">Sold</span>}
+                {c.type && c.remaining > 0 && (
+                  <span className="timer">{c.upgradePending ? `Upgrading · ${c.remaining}s` : `${c.remaining}s`}</span>
+                )}
+              </button>
+            )
+          })}
         </section>
         <div className="dock" role="toolbar" aria-label="Quick actions">
           <button className={'dock-btn danger' + (tool === 'demolish' ? ' active' : '')} onClick={() => setTool((t) => (t === 'demolish' ? 'build' : 'demolish'))} aria-pressed={tool === 'demolish'}><span>💥</span>{tool === 'demolish' ? 'Tap building' : 'Demolish'}</button>
