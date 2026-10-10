@@ -5,7 +5,7 @@ import ramblerPhase3 from '../../bungalow phase 3.png'
 import ramblerPhase4 from '../../bungalow phase 4.png'
 import ramblerPhase5 from '../../Bungalow phase 5.png'
 import ramblerWallMask from './rambler-walls-mask.png'
-import { PAINT_COLORS } from './data'
+import { MAX_UPGRADE, PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
 
 const ramblerPhases = [ramblerPhase1, ramblerPhase2, ramblerPhase3, ramblerPhase4, ramblerPhase5]
@@ -198,83 +198,70 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor,
   if (type === 'rambler') {
     const phase = progress >= 1 ? 4 : Math.min(3, Math.floor(Math.max(0, progress) * 4))
     return (
-      <div className="rambler-art" aria-hidden="true">
-        <div className="rambler-stage">
-          <img src={ramblerPhases[phase]} alt="" />
-          {paint && phase === 4 && (
-            <div
-              className="rambler-paint"
-              style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${ramblerWallMask})`, maskImage: `url(${ramblerWallMask})` }}
-            />
-          )}
-          {newPaint && phase === 4 && (
-            <div
-              className="rambler-paint"
-              style={{
-                backgroundColor: newPaint.value,
-                WebkitMaskImage: `url(${ramblerWallMask})`,
-                maskImage: `url(${ramblerWallMask})`,
-                clipPath: `inset(${RAMBLER_WALL_BOTTOM - bandFraction * (RAMBLER_WALL_BOTTOM - RAMBLER_WALL_TOP)}% 0 0 0)`,
-              }}
-            />
-          )}
+      <div className="building-art" aria-hidden="true">
+        <div className="rambler-art">
+          <div className="rambler-stage">
+            <img src={ramblerPhases[phase]} alt="" />
+            {paint && phase === 4 && (
+              <div
+                className="rambler-paint"
+                style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${ramblerWallMask})`, maskImage: `url(${ramblerWallMask})` }}
+              />
+            )}
+            {newPaint && phase === 4 && (
+              <div
+                className="rambler-paint"
+                style={{
+                  backgroundColor: newPaint.value,
+                  WebkitMaskImage: `url(${ramblerWallMask})`,
+                  maskImage: `url(${ramblerWallMask})`,
+                  clipPath: `inset(${RAMBLER_WALL_BOTTOM - bandFraction * (RAMBLER_WALL_BOTTOM - RAMBLER_WALL_TOP)}% 0 0 0)`,
+                }}
+              />
+            )}
+          </div>
         </div>
+        {level > 0 && <span className="upgrade-stars">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
       </div>
     )
   }
 
   return (
-    <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false">
-      <ellipse cx="61" cy="86" rx="49" ry="19" fill="#57834b" opacity=".34" />
-      <ellipse cx="59" cy="83" rx="47" ry="18" fill="#a7cf72" />
-      <path d="m21 82 8-4m58 11 8-4M45 96l4-4m36-21 5-2" stroke="#e4e99b" strokeWidth="2" strokeLinecap="round" />
-      <path d="m17 85 3-2m81-8 3-2M36 97l3-2" stroke="#638b4b" strokeWidth="3" strokeLinecap="round" />
-      {progress < 1 && (
-        <>
-          <path d="m28 80 35-16 34 16-34 18Z" fill={foundationColors[type]} stroke="#655d4d" strokeWidth="2" strokeLinejoin="round" />
-          <path d="m37 81 26-12 26 12-26 13Z" fill="none" stroke="#e9dfc4" strokeWidth="2" />
-        </>
-      )}
-      {reveal > 0 && (
-        <>
-          <defs>
-            <clipPath id={clipId}>
-              <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
-            </clipPath>
-          </defs>
-          <g clipPath={`url(#${clipId})`} >{shownArt[type]}</g>
-          {paintedArt && (
-            <>
-              <defs>
-                <clipPath id={`${clipId}-paint`}>
-                  <rect x="0" y={(wallExtent[type]?.[1] ?? 100) - bandFraction * ((wallExtent[type]?.[1] ?? 100) - (wallExtent[type]?.[0] ?? 32))} width="120" height="110" />
-                </clipPath>
-              </defs>
-              <g clipPath={`url(#${clipId}-paint)`}>{paintedArt[type]}</g>
-            </>
-          )}
-          {progress >= 1 && level >= 1 && (
-            <>
-              <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />
-              <path d="m104 52 12 5-12 5Z" fill="#e0523f" stroke="#6c563d" strokeWidth="1.5" strokeLinejoin="round" />
-            </>
-          )}
-          {progress >= 1 && level >= 2 && (
-            <>
-              <path d="M18 88 61 106 104 88" fill="none" stroke="#f2c230" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="22" cy="70" r="4" fill="#ffd966" stroke="#9a6b12" strokeWidth="1.5" />
-              <circle cx="14" cy="76" r="3" fill="#ffd966" stroke="#9a6b12" strokeWidth="1.5" />
-            </>
-          )}
-          {progress >= 1 && level >= 3 && (
-            <>
-              <ellipse cx="60" cy="58" rx="52" ry="46" fill="none" stroke="#ffd34d" strokeWidth="2" strokeDasharray="4 5" opacity=".9" />
-              <path d="m60 4 4 9 10 1-8 7 3 10-9-6-9 6 3-10-8-7 10-1Z" fill="#ffd34d" stroke="#9a6b12" strokeWidth="1.5" strokeLinejoin="round" />
-            </>
-          )}
-        </>
-      )}
-      <path d="M22 82c2 0 3 2 2 4-2 2-5 0-4-2m77 8c2 0 3 2 2 4-2 2-5 0-4-2" fill="#f7e794" />
-    </svg>
+    <div className="building-art">
+      <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false">
+        <ellipse cx="61" cy="86" rx="49" ry="19" fill="#57834b" opacity=".34" />
+        <ellipse cx="59" cy="83" rx="47" ry="18" fill="#a7cf72" />
+        <path d="m21 82 8-4m58 11 8-4M45 96l4-4m36-21 5-2" stroke="#e4e99b" strokeWidth="2" strokeLinecap="round" />
+        <path d="m17 85 3-2m81-8 3-2M36 97l3-2" stroke="#638b4b" strokeWidth="3" strokeLinecap="round" />
+        {progress < 1 && (
+          <>
+            <path d="m28 80 35-16 34 16-34 18Z" fill={foundationColors[type]} stroke="#655d4d" strokeWidth="2" strokeLinejoin="round" />
+            <path d="m37 81 26-12 26 12-26 13Z" fill="none" stroke="#e9dfc4" strokeWidth="2" />
+          </>
+        )}
+        {reveal > 0 && (
+          <>
+            <defs>
+              <clipPath id={clipId}>
+                <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
+              </clipPath>
+            </defs>
+            <g clipPath={`url(#${clipId})`} >{shownArt[type]}</g>
+            {paintedArt && (
+              <>
+                <defs>
+                  <clipPath id={`${clipId}-paint`}>
+                    <rect x="0" y={(wallExtent[type]?.[1] ?? 100) - bandFraction * ((wallExtent[type]?.[1] ?? 100) - (wallExtent[type]?.[0] ?? 32))} width="120" height="110" />
+                  </clipPath>
+                </defs>
+                <g clipPath={`url(#${clipId}-paint)`}>{paintedArt[type]}</g>
+              </>
+            )}
+          </>
+        )}
+        <path d="M22 82c2 0 3 2 2 4-2 2-5 0-4-2m77 8c2 0 3 2 2 4-2 2-5 0-4-2" fill="#f7e794" />
+      </svg>
+      {level > 0 && <span className="upgrade-stars" aria-hidden="true">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
+    </div>
   )
 }
