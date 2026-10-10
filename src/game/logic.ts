@@ -1,4 +1,4 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import { BUILDINGS, CONDITION_DECAY_TICKS, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
 import type { BuildingType, Cell, GameState, PaintColor } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
@@ -84,7 +84,7 @@ const updateCell = (g: GameState, index: number, fn: (c: Cell) => Cell, gain = 0
 
 export function upgrade(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell || !cell.type || !isOwned(cell) || cell.level >= MAX_UPGRADE) return g
+  if (!cell || !cell.type || !isOwned(cell) || cell.level >= MAX_UPGRADE || cell.paintingColor || cell.landscapeRemaining) return g
   if (busyBuilders(g) + BUILDINGS[cell.type].workers > builders(g)) return g
   const materials = upgradeCost(cell.type, cell.level)
   if (g.resources.materials < materials) return g
@@ -107,17 +107,17 @@ export const upgradeCost = (type: BuildingType, level: number) =>
 
 export function landscape(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell?.type || !isOwned(cell) || cell.landscaped) return g
+  if (!cell?.type || !isOwned(cell) || cell.landscaped || cell.paintingColor || cell.landscapeRemaining) return g
   const cost = improvementCost(cell.type)
   if (g.resources.materials < cost) return g
   const grid = g.grid.slice()
-  grid[index] = { ...cell, landscaped: true }
+  grid[index] = { ...cell, landscapeRemaining: LANDSCAPE_TIME, landscapeDuration: LANDSCAPE_TIME }
   return { ...g, resources: { ...g.resources, materials: g.resources.materials - cost }, grid }
 }
 
 export function paintBuilding(g: GameState, index: number, color: PaintColor = PAINT_COLORS[0].id): GameState {
   const cell = g.grid[index]
-  if (!cell?.type || !isOwned(cell) || cell.remaining > 0 || cell.paintingColor || (cell.painted && cell.paintColor === color)) return g
+  if (!cell?.type || !isOwned(cell) || cell.remaining > 0 || cell.paintingColor || cell.landscapeRemaining || (cell.painted && cell.paintColor === color)) return g
   const cost = improvementCost(cell.type)
   if (g.resources.materials < cost) return g
   const grid = g.grid.slice()
@@ -136,7 +136,7 @@ export const improvementCost = (type: BuildingType) => Math.floor(BUILDINGS[type
 
 export function maintain(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell?.type || !isOwned(cell) || cell.condition >= 100) return g
+  if (!cell?.type || !isOwned(cell) || cell.condition >= 100 || cell.paintingColor || cell.landscapeRemaining) return g
   const cost = maintenanceCost(cell.type)
   if (g.resources.materials < cost) return g
   const grid = g.grid.slice()
@@ -160,7 +160,7 @@ export function hireWorkers(g: GameState, workers: number): GameState {
 
 export function sell(g: GameState, index: number): GameState {
   const cell = g.grid[index]
-  if (!cell || !isOwned(cell)) return g
+  if (!cell || !isOwned(cell) || cell.paintingColor || cell.landscapeRemaining) return g
   return updateCell(g, index, (c) => ({ ...c, sold: true }), houseValue(cell))
 }
 
@@ -226,6 +226,12 @@ export function tick(g: GameState): GameState {
         ? { ...c, painted: true, paintColor: c.paintingColor, paintingColor: undefined, paintRemaining: undefined, paintDuration: undefined }
         : { ...c, paintRemaining }
     }
+    if (c.landscapeRemaining) {
+      const landscapeRemaining = Math.max(0, c.landscapeRemaining - 1)
+      c = landscapeRemaining === 0
+        ? { ...c, landscaped: true, landscapeRemaining: undefined, landscapeDuration: undefined }
+        : { ...c, landscapeRemaining }
+    }
     if (c.type && c.remaining > 0) {
       const remaining = Math.max(0, c.remaining - 1)
       return remaining === 0
@@ -264,6 +270,7 @@ export function isValid(s: unknown): s is GameState {
       (c.painted === undefined || typeof c.painted === 'boolean') &&
       (c.paintingColor === undefined || (PAINT_COLORS.some(({ id }) => id === c.paintingColor) && Number.isFinite(c.paintRemaining) && Number.isFinite(c.paintDuration) && (c.paintDuration as number) > 0)) &&
       (c.paintColor === undefined || PAINT_COLORS.some(({ id }) => id === c.paintColor)) &&
+      (c.landscapeRemaining === undefined || (Number.isFinite(c.landscapeRemaining) && c.landscapeRemaining > 0 && Number.isFinite(c.landscapeDuration) && (c.landscapeDuration as number) > 0)) &&
       (c.landscaped === undefined || typeof c.landscaped === 'boolean') &&
       (c.condition === undefined || (typeof c.condition === 'number' && c.condition >= 0 && c.condition <= 100)))
   )
