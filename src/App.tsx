@@ -157,7 +157,7 @@ export default function App() {
                 key={i}
                 className={'cell' + (c.type ? (c.remaining ? ' building' : c.sold ? ' built sold' : ' built') : c.lotOwned ? '' : ' unowned')}
                 onClick={() => onCell(i)}
-                aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, ${c.upgradePending ? 'upgrade' : 'construction'} in progress, ${c.remaining} seconds left` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
+                aria-label={c.type ? `${BUILDINGS[c.type].name}${c.remaining ? `, ${c.upgradePending ? 'upgrade' : 'construction'} in progress` : c.sold ? `, level ${c.level + 1}, sold` : `, level ${c.level + 1}`}` : c.lotOwned ? 'Owned empty lot' : `Unowned lot, $${LOT_COST.toLocaleString()}`}
               >
                 <LotArt owned={c.lotOwned} built={!!c.type} phase={phase} landscaped={c.landscaped} />
                 {c.type && (
