@@ -27,6 +27,8 @@ export interface Cell {
   paintRemaining?: number
   paintDuration?: number
   landscaped: boolean
+  landscapeRemaining?: number
+  landscapeDuration?: number
   /** sold to someone else: stays on the lot but no longer owned */
   sold: boolean
 }

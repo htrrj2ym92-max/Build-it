@@ -46,7 +46,8 @@ export const LEVELS: Level[] = [
   { size: 6, goal: { buildings: { rambler: 5 } } },
 ]
 
-export const PAINT_TIME = 8
+export const PAINT_TIME = 5
+export const LANDSCAPE_TIME = 5
 export const LOT_COST = 25_000
 export const MAX_UPGRADE = 3
 export const CONDITION_DECAY_TICKS = 10

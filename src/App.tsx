@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
 import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, demolish, goalProgress, hasSawmill, hasWorkshop, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, paintStage, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
@@ -96,6 +96,24 @@ export default function App() {
     return Math.min(1, Math.max(0, (duration - cell.remaining) / duration))
   }
 
+  const taskProgress = (cell: GameState['grid'][number]) => {
+    if (!cell.type) return null
+    if (cell.remaining > 0) {
+      const duration = cell.taskDuration ?? (cell.upgradePending ? BUILDINGS[cell.type].upgradeTime : BUILDINGS[cell.type].buildTime)
+      return {
+        label: cell.upgradePending ? 'Upgrade progress' : 'Construction progress',
+        value: Math.min(100, Math.max(0, (duration - cell.remaining) / duration * 100)),
+      }
+    }
+    if (cell.paintingColor && cell.paintRemaining && cell.paintDuration) {
+      return { label: 'Painting progress', value: (cell.paintDuration - cell.paintRemaining) / cell.paintDuration * 100 }
+    }
+    if (cell.landscapeRemaining && cell.landscapeDuration) {
+      return { label: 'Landscaping progress', value: (cell.landscapeDuration - cell.landscapeRemaining) / cell.landscapeDuration * 100 }
+    }
+    return null
+  }
+
   const costLabel = (type: BuildingType) =>
     `${BUILDINGS[type].cost.toLocaleString()} materials`
 
@@ -130,6 +148,7 @@ export default function App() {
         <section className="board" aria-label="Neighborhood building lots" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
           {game.grid.map((c, i) => {
             const progress = constructionProgress(c)
+            const activeTask = taskProgress(c)
             const phase = c.type === 'rambler' && c.remaining > 0 && !c.upgradePending
               ? Math.min(4, Math.floor(progress * 4) + 1)
               : undefined
@@ -152,8 +171,10 @@ export default function App() {
                   />
                 )}
                 {c.sold && <span className="timer sold-tag">Sold</span>}
-                {c.type && c.remaining > 0 && (
-                  <span className="timer">{c.upgradePending ? `Upgrading · ${c.remaining}s` : `${c.remaining}s`}</span>
+                {activeTask && (
+                  <span className="cell-progress" role="progressbar" aria-label={activeTask.label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(activeTask.value)}>
+                    <span className="task-progress-fill" style={{ width: `${activeTask.value}%` }} />
+                  </span>
                 )}
               </button>
             )
@@ -255,7 +276,12 @@ export default function App() {
           <div className="modal build-modal" role="dialog" aria-modal="true" aria-labelledby="manage-title" onClick={(event) => event.stopPropagation()}>
             <h2 id="manage-title">{BUILDINGS[sel.type].icon} {BUILDINGS[sel.type].name}</h2>
             <div className="manage-art"><BuildingArt type={sel.type} level={sel.level} paintColor={sel.paintColor} paintingColor={sel.paintingColor} paintStage={paintStage(sel)} /></div>
-            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.upgradePending ? ` · Upgrading (${sel.remaining}s left)` : ''}{sel.painted ? ` · Painted ${PAINT_COLORS.find(({ id }) => id === sel.paintColor)?.name ?? PAINT_COLORS[0].name}` : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
+            <p>Level {sel.level + 1}/{MAX_UPGRADE + 1} · Condition {sel.condition}%{sel.upgradePending ? ' · Upgrading…' : ''}{sel.paintingColor ? ' · Painting…' : ''}{sel.landscapeRemaining ? ' · Landscaping…' : ''}{sel.painted ? ` · Painted ${PAINT_COLORS.find(({ id }) => id === sel.paintColor)?.name ?? PAINT_COLORS[0].name}` : ''}{sel.landscaped ? ' · Landscaped' : ''}{sel.sold ? ' · Sold' : ''}</p>
+            {taskProgress(sel) && (
+              <div className="task-progress" role="progressbar" aria-label={taskProgress(sel)?.label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(taskProgress(sel)?.value ?? 0)}>
+                <span className="task-progress-fill" style={{ width: `${taskProgress(sel)?.value ?? 0}%` }} />
+              </div>
+            )}
             <p>Current value: ${houseValue(sel).toLocaleString()}</p>
             {sel.sold ? (
               <p>This property was sold and no longer earns you income.</p>
@@ -276,23 +302,23 @@ export default function App() {
                 ))}
               </div>
               <div className="build-options">
-                <button className="tool" disabled={sel.remaining > 0 || !!sel.paintingColor || sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level) || free < BUILDINGS[sel.type].workers} onClick={() => act(upgrade)}>
+                <button className="tool" disabled={sel.remaining > 0 || !!sel.paintingColor || !!sel.landscapeRemaining || sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level) || free < BUILDINGS[sel.type].workers} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
-                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · ${BUILDINGS[sel.type].upgradeTime}s · ${BUILDINGS[sel.type].workers} workers`}</small>
+                  <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · ${BUILDINGS[sel.type].workers} workers`}</small>
                 </button>
-                <button className="tool" disabled={sel.remaining > 0 || (sel.painted && sel.paintColor === chosenPaint) || game.resources.materials < improvementCost(sel.type)} onClick={() => act((g, i) => paintBuilding(g, i, chosenPaint))}>
+                <button className="tool" disabled={sel.remaining > 0 || !!sel.paintingColor || !!sel.landscapeRemaining || (sel.painted && sel.paintColor === chosenPaint) || game.resources.materials < improvementCost(sel.type)} onClick={() => act((g, i) => paintBuilding(g, i, chosenPaint))}>
                   <b>🎨 {sel.paintingColor ? 'Painting…' : sel.painted ? 'Repaint' : 'Paint'}</b>
-                  <small>{sel.painted && sel.paintColor === chosenPaint ? 'Already painted this color' : `${sel.painted ? 'Same value' : '+5% value'} · ${improvementCost(sel.type)} materials`}</small>
+                  <small>{sel.painted && sel.paintColor === chosenPaint ? 'Already painted this color' : `${sel.painted ? 'Same value' : '+5% value'} · ${PAINT_TIME}s · ${improvementCost(sel.type)} materials`}</small>
                 </button>
-                <button className="tool" disabled={sel.remaining > 0 || sel.landscaped || game.resources.materials < improvementCost(sel.type)} onClick={() => act(landscape)}>
-                  <b>🌿 Landscape</b>
-                  <small>{sel.landscaped ? 'Already landscaped' : `+5% value · ${improvementCost(sel.type)} materials`}</small>
+                <button className="tool" disabled={sel.remaining > 0 || !!sel.paintingColor || !!sel.landscapeRemaining || sel.landscaped || game.resources.materials < improvementCost(sel.type)} onClick={() => act(landscape)}>
+                  <b>🌿 {sel.landscapeRemaining ? 'Landscaping…' : 'Landscape'}</b>
+                  <small>{sel.landscaped ? 'Already landscaped' : `+5% value · ${LANDSCAPE_TIME}s · ${improvementCost(sel.type)} materials`}</small>
                 </button>
-                <button className="tool" disabled={sel.remaining > 0 || sel.condition >= 100 || game.resources.materials < maintenanceCost(sel.type)} onClick={() => act(maintain)}>
+                <button className="tool" disabled={sel.remaining > 0 || !!sel.paintingColor || !!sel.landscapeRemaining || sel.condition >= 100 || game.resources.materials < maintenanceCost(sel.type)} onClick={() => act(maintain)}>
                   <b>🔧 Maintain</b>
                   <small>{sel.condition >= 100 ? 'In perfect shape' : `Restore condition · ${maintenanceCost(sel.type)} materials`}</small>
                 </button>
-                <button className="tool" disabled={!isOwned(sel)} onClick={() => act(sell, true)}>
+                <button className="tool" disabled={!isOwned(sel) || !!sel.paintingColor || !!sel.landscapeRemaining} onClick={() => act(sell, true)}>
                   <b>💵 Sell</b>
                   <small>Receive full value: ${houseValue(sel).toLocaleString()}</small>
                 </button>
@@ -333,7 +359,7 @@ export default function App() {
                       <button key={type} className={'tool' + (affordable && enoughWorkers ? '' : ' poor')} disabled={!affordable || !enoughWorkers} onClick={() => constructAt(type)}>
                         <b>{def.icon} {def.name}</b>
                         <small>{costLabel(type)}</small>
-                        <small>{def.workers} worker{def.workers === 1 ? '' : 's'} · {def.buildTime}s</small>
+                        <small>{def.workers} worker{def.workers === 1 ? '' : 's'}</small>
                         <small>{def.desc}</small>
                       </button>
                     )
