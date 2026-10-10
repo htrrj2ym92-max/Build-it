@@ -4,16 +4,17 @@ import ramblerPhase2 from '../../bungalow phase 2.png'
 import ramblerPhase3 from '../../bungalow phase 3.png'
 import ramblerPhase4 from '../../bungalow phase 4.png'
 import ramblerPhase5 from '../../Bungalow phase 5.png'
+import ramblerWallMask from './rambler-walls-mask.png'
 import { PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
 
 const ramblerPhases = [ramblerPhase1, ramblerPhase2, ramblerPhase3, ramblerPhase4, ramblerPhase5]
 
-const art: Record<string, ReactNode> = {
+const makeArt = (w: { light?: string; dark?: string }): Record<string, ReactNode> => ({
   house: (
     <>
-      <path fill="#f5c66b" stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="M29 47 67 32l28 15v39L67 99 29 83Z" />
-      <path fill="#e9a84f" stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="m67 32 28 15v39L67 99Z" />
+      <path fill={w.light ?? "#f5c66b"} stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="M29 47 67 32l28 15v39L67 99 29 83Z" />
+      <path fill={w.dark ?? "#e9a84f"} stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="m67 32 28 15v39L67 99Z" />
       <path fill="#d95d4c" stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="m23 47 31-28 21 13-8 12-19-10-19 20Z" />
       <path fill="#b94741" stroke="#8d5736" strokeWidth="2" strokeLinejoin="round" d="m54 19 32 17 13 12-12 6-20-12-10 2 8-12Z" />
       <path fill="#8d5736" d="M54 69a8 8 0 0 1 16 0v27l-16 6Z" />
@@ -54,8 +55,8 @@ const art: Record<string, ReactNode> = {
   ),
   lumber: (
     <>
-      <path fill="#c8884b" stroke="#784a30" strokeWidth="2" strokeLinejoin="round" d="m24 53 39-17 33 17v30L63 100 24 82Z" />
-      <path fill="#a9693e" stroke="#784a30" strokeWidth="2" strokeLinejoin="round" d="m63 36 33 17v30L63 100Z" />
+      <path fill={w.light ?? "#c8884b"} stroke="#784a30" strokeWidth="2" strokeLinejoin="round" d="m24 53 39-17 33 17v30L63 100 24 82Z" />
+      <path fill={w.dark ?? "#a9693e"} stroke="#784a30" strokeWidth="2" strokeLinejoin="round" d="m63 36 33 17v30L63 100Z" />
       <path fill="#b65f45" stroke="#784a30" strokeWidth="2" strokeLinejoin="round" d="m18 53 44-25 41 22-11 8-30-16-28 17Z" />
       <path fill="#ead39a" stroke="#784a30" strokeWidth="2" d="m36 60 27-14v36L36 95Z" />
       <path fill="#d9b66e" stroke="#784a30" strokeWidth="2" d="m64 61 19-10v24L64 86Z" />
@@ -81,8 +82,8 @@ const art: Record<string, ReactNode> = {
   ),
   market: (
     <>
-      <path fill="#f3d7a0" stroke="#86593a" strokeWidth="2" strokeLinejoin="round" d="m24 49 40-17 33 17v34L64 100 24 82Z" />
-      <path fill="#e2bd78" stroke="#86593a" strokeWidth="2" strokeLinejoin="round" d="m64 32 33 17v34L64 100Z" />
+      <path fill={w.light ?? "#f3d7a0"} stroke="#86593a" strokeWidth="2" strokeLinejoin="round" d="m24 49 40-17 33 17v34L64 100 24 82Z" />
+      <path fill={w.dark ?? "#e2bd78"} stroke="#86593a" strokeWidth="2" strokeLinejoin="round" d="m64 32 33 17v34L64 100Z" />
       <path fill="#f4f0d7" stroke="#86593a" strokeWidth="2" d="m34 58 29-13v34L34 92Z" />
       <path fill="#a85744" stroke="#86593a" strokeWidth="2" d="m64 59 23-11v27L64 87Z" />
       <path fill="#f4f0d7" stroke="#86593a" strokeWidth="2" d="M69 65v17l13-6V59Z" />
@@ -94,8 +95,8 @@ const art: Record<string, ReactNode> = {
   ),
   hut: (
     <>
-      <path fill="#e0ae68" stroke="#835437" strokeWidth="2" strokeLinejoin="round" d="m31 49 34-15 29 15v37L65 99 31 82Z" />
-      <path fill="#cc8e50" stroke="#835437" strokeWidth="2" strokeLinejoin="round" d="m65 34 29 15v37L65 99Z" />
+      <path fill={w.light ?? "#e0ae68"} stroke="#835437" strokeWidth="2" strokeLinejoin="round" d="m31 49 34-15 29 15v37L65 99 31 82Z" />
+      <path fill={w.dark ?? "#cc8e50"} stroke="#835437" strokeWidth="2" strokeLinejoin="round" d="m65 34 29 15v37L65 99Z" />
       <path fill="#8b6445" stroke="#65432f" strokeWidth="2" strokeLinejoin="round" d="m25 49 39-29 36 26-8 11-27-18-32 21Z" />
       <path fill="#5a4939" stroke="#65432f" strokeWidth="2" d="M53 71a12 12 0 0 1 24 0v25l-24 6Z" />
       <path fill="#a7dce1" stroke="#65432f" strokeWidth="2" d="m35 58 12 6v12l-12-6Z" />
@@ -108,8 +109,8 @@ const art: Record<string, ReactNode> = {
   ),
   workshop: (
     <>
-      <path fill="#d6a664" stroke="#755137" strokeWidth="2" strokeLinejoin="round" d="m25 49 39-17 33 17v35L64 101 25 83Z" />
-      <path fill="#bd8249" stroke="#755137" strokeWidth="2" strokeLinejoin="round" d="m64 32 33 17v35L64 101Z" />
+      <path fill={w.light ?? "#d6a664"} stroke="#755137" strokeWidth="2" strokeLinejoin="round" d="m25 49 39-17 33 17v35L64 101 25 83Z" />
+      <path fill={w.dark ?? "#bd8249"} stroke="#755137" strokeWidth="2" strokeLinejoin="round" d="m64 32 33 17v35L64 101Z" />
       <path fill="#855441" stroke="#60402f" strokeWidth="2" strokeLinejoin="round" d="m19 49 44-26 40 24-8 11-31-18-34 20Z" />
       <path fill="#ead39a" stroke="#755137" strokeWidth="2" d="m34 58 27-12v34L34 94Z" />
       <path fill="#e5bf78" stroke="#755137" strokeWidth="2" d="m68 60 19-9v24l-19 9Z" />
@@ -120,8 +121,8 @@ const art: Record<string, ReactNode> = {
   ),
   tower: (
     <>
-      <path fill="#b9bec0" stroke="#606b70" strokeWidth="2" strokeLinejoin="round" d="m36 41 28-12 30 15v44L64 101 36 86Z" />
-      <path fill="#929ea1" stroke="#606b70" strokeWidth="2" strokeLinejoin="round" d="m64 29 30 15v44L64 101Z" />
+      <path fill={w.light ?? "#b9bec0"} stroke="#606b70" strokeWidth="2" strokeLinejoin="round" d="m36 41 28-12 30 15v44L64 101 36 86Z" />
+      <path fill={w.dark ?? "#929ea1"} stroke="#606b70" strokeWidth="2" strokeLinejoin="round" d="m64 29 30 15v44L64 101Z" />
       <path fill="#d7d9d2" stroke="#606b70" strokeWidth="2" d="M43 41V29l8 4v-8l8 4v-8l10 5v12Z" />
       <path fill="#b7bfbe" stroke="#606b70" strokeWidth="2" d="M64 38V26l9 5v-8l8 4v-8l10 6v22Z" />
       <path fill="#8d4f4e" stroke="#60413c" strokeWidth="2" strokeLinejoin="round" d="m29 42 35-25 38 24-9 10-29-18-27 19Z" />
@@ -135,8 +136,8 @@ const art: Record<string, ReactNode> = {
   ),
   castle: (
     <>
-      <path fill="#c7c7bb" stroke="#5d6262" strokeWidth="2" strokeLinejoin="round" d="m22 53 42-22 40 22v35L64 108 22 86Z" />
-      <path fill="#a3aaa5" stroke="#5d6262" strokeWidth="2" strokeLinejoin="round" d="m64 31 40 22v35L64 108Z" />
+      <path fill={w.light ?? "#c7c7bb"} stroke="#5d6262" strokeWidth="2" strokeLinejoin="round" d="m22 53 42-22 40 22v35L64 108 22 86Z" />
+      <path fill={w.dark ?? "#a3aaa5"} stroke="#5d6262" strokeWidth="2" strokeLinejoin="round" d="m64 31 40 22v35L64 108Z" />
       <path fill="#d6d4c7" stroke="#5d6262" strokeWidth="2" d="M29 54V36l8 4V29l9 5V24l10 5v17Zm37-19V20l9 4V15l9 5V11l10 6v25Z" />
       <path fill="#b7bdb7" stroke="#5d6262" strokeWidth="2" d="M64 46V32l8 4V25l9 5V21l9 5v23Z" />
       <path fill="#9d554d" stroke="#62433d" strokeWidth="2" strokeLinejoin="round" d="m24 39 18-23 19 23-8 8-11-13-11 15Zm37-1 20-29 22 31-9 9-13-18-12 18Z" />
@@ -147,9 +148,9 @@ const art: Record<string, ReactNode> = {
       <path fill="#e1c173" d="M61 80h5v2h-5z" />
     </>
   ),
-}
+})
 
-const buildingArt: Record<BuildingType, ReactNode> = {
+const buildingArt = (art: Record<string, ReactNode>): Record<BuildingType, ReactNode> => ({
   rambler: art.rambler,
   colonial: art.market,
   tudor: art.workshop,
@@ -158,12 +159,13 @@ const buildingArt: Record<BuildingType, ReactNode> = {
   castle: art.castle,
   workshop: art.workshop,
   sawmill: art.lumber,
-}
+})
 
 export default function BuildingArt({ type, progress = 1, level = 0, paintColor }: { type: BuildingType; progress?: number; level?: number; paintColor?: PaintColor }) {
   const clipId = useId().replace(/:/g, '')
   const reveal = progress >= 1 ? 1 : progress < 0.25 ? 0 : progress < 0.55 ? 0.52 : 0.88
-  const paintHue = PAINT_COLORS.find(({ id }) => id === paintColor)?.hue ?? 0
+  const paint = PAINT_COLORS.find(({ id }) => id === paintColor)
+  const shownArt = buildingArt(makeArt(paint ? { light: paint.value, dark: paint.dark } : {}))
   const foundationColors: Record<BuildingType, string> = {
     rambler: '#d8b982',
     colonial: '#d7c69d',
@@ -177,7 +179,17 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
 
   if (type === 'rambler') {
     const phase = progress >= 1 ? 4 : Math.min(3, Math.floor(Math.max(0, progress) * 4))
-    return <img className="rambler-art" src={ramblerPhases[phase]} alt="" aria-hidden="true" />
+    return (
+      <div className="rambler-art" aria-hidden="true">
+        <img src={ramblerPhases[phase]} alt="" />
+        {paint && phase === 4 && (
+          <div
+            className="rambler-paint"
+            style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${ramblerWallMask})`, maskImage: `url(${ramblerWallMask})` }}
+          />
+        )}
+      </div>
+    )
   }
 
   return (
@@ -199,7 +211,7 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
               <rect x="0" y={110 * (1 - reveal)} width="120" height={110 * reveal} />
             </clipPath>
           </defs>
-          <g clipPath={`url(#${clipId})`} style={paintColor ? { filter: `hue-rotate(${paintHue}deg)` } : undefined}>{buildingArt[type]}</g>
+          <g clipPath={`url(#${clipId})`} >{shownArt[type]}</g>
           {progress >= 1 && level >= 1 && (
             <>
               <path d="M104 78V52" stroke="#6c563d" strokeWidth="2" strokeLinecap="round" />

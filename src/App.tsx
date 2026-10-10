@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_ORDER, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
-import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, changePaintColor, demolish, goalProgress, hasSawmill, hasWorkshop, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
+import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, demolish, goalProgress, hasSawmill, hasWorkshop, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
 import { clearSave, loadGame, saveGame } from './game/storage'
-import type { BuildingType, GameState } from './game/types'
+import type { BuildingType, GameState, PaintColor } from './game/types'
 
 type Tool = 'build' | 'demolish'
 
@@ -13,6 +13,7 @@ export default function App() {
   const [tool, setTool] = useState<Tool>('build')
   const [selectedLot, setSelectedLot] = useState<number | null>(null)
   const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null)
+  const [paintChoice, setPaintChoice] = useState<PaintColor | null>(null)
   const [paused, setPaused] = useState(false)
   const previousMoney = useRef(game.money)
 
@@ -68,6 +69,7 @@ export default function App() {
     } else if (!game.grid[i]?.type) {
       setSelectedLot(i)
     } else if (game.grid[i].remaining === 0) {
+      setPaintChoice(null)
       setSelectedBuilding(i)
     }
   }
@@ -86,6 +88,7 @@ export default function App() {
   }
 
   const sel = selectedBuilding !== null ? game.grid[selectedBuilding] : null
+  const chosenPaint: PaintColor = paintChoice ?? sel?.paintColor ?? PAINT_COLORS[0].id
 
   const constructionProgress = (cell: GameState['grid'][number]) => {
     if (!cell.type || cell.remaining <= 0 || cell.upgradePending) return 1
@@ -255,27 +258,29 @@ export default function App() {
             {sel.sold ? (
               <p>This property was sold and no longer earns you income.</p>
             ) : (
-              <div className="build-options">
-                {sel.painted && PAINT_COLORS.map(({ id, name, value }) => (
+              <>
+              <div className="paint-swatches" role="group" aria-label="Paint color">
+                {PAINT_COLORS.map(({ id, name, value }) => (
                   <button
                     key={id}
                     type="button"
-                    aria-label={`Change paint color to ${name}`}
-                    aria-pressed={sel.paintColor === id}
-                    title={`Change paint color to ${name}`}
-                    onClick={() => act((g, i) => changePaintColor(g, i, id))}
-                    style={{ backgroundColor: value, outline: sel.paintColor === id ? '3px solid #2b3a1f' : undefined }}
-                  >
-                    {name}
-                  </button>
+                    className="swatch"
+                    aria-label={`Select ${name} paint`}
+                    aria-pressed={chosenPaint === id}
+                    title={name}
+                    onClick={() => setPaintChoice(id)}
+                    style={{ backgroundColor: value }}
+                  />
                 ))}
+              </div>
+              <div className="build-options">
                 <button className="tool" disabled={sel.remaining > 0 || sel.level >= MAX_UPGRADE || game.resources.materials < upgradeCost(sel.type, sel.level) || free < BUILDINGS[sel.type].workers} onClick={() => act(upgrade)}>
                   <b>⬆️ Upgrade</b>
                   <small>{sel.level >= MAX_UPGRADE ? 'Max level' : `+10% value · ${upgradeCost(sel.type, sel.level).toLocaleString()} materials · ${BUILDINGS[sel.type].upgradeTime}s · ${BUILDINGS[sel.type].workers} workers`}</small>
                 </button>
-                <button className="tool" disabled={sel.remaining > 0 || sel.painted || game.resources.materials < improvementCost(sel.type)} onClick={() => act(paintBuilding)}>
-                  <b>🎨 Paint</b>
-                  <small>{sel.painted ? 'Already painted' : `+5% value · ${improvementCost(sel.type)} materials`}</small>
+                <button className="tool" disabled={sel.remaining > 0 || (sel.painted && sel.paintColor === chosenPaint) || game.resources.materials < improvementCost(sel.type)} onClick={() => act((g, i) => paintBuilding(g, i, chosenPaint))}>
+                  <b>🎨 {sel.painted ? 'Repaint' : 'Paint'}</b>
+                  <small>{sel.painted && sel.paintColor === chosenPaint ? 'Already painted this color' : `${sel.painted ? 'Same value' : '+5% value'} · ${improvementCost(sel.type)} materials`}</small>
                 </button>
                 <button className="tool" disabled={sel.remaining > 0 || sel.landscaped || game.resources.materials < improvementCost(sel.type)} onClick={() => act(landscape)}>
                   <b>🌿 Landscape</b>
@@ -294,6 +299,7 @@ export default function App() {
                   <small>Returns 60% of materials</small>
                 </button>
               </div>
+              </>
             )}
             <button className="cancel-build" onClick={() => setSelectedBuilding(null)}>Close</button>
           </div>

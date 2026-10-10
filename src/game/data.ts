@@ -24,11 +24,13 @@ export const BUILDINGS: Record<BuildingType, BuildingDef> = {
 }
 
 export const BUILDING_ORDER: BuildingType[] = ['rambler', 'colonial', 'tudor', 'estate', 'mansion', 'castle', 'workshop', 'sawmill']
-export const PAINT_COLORS: { id: PaintColor; name: string; value: string; hue: number }[] = [
-  { id: 'red', name: 'Red', value: '#d95d4c', hue: 0 },
-  { id: 'blue', name: 'Blue', value: '#4387bd', hue: 200 },
-  { id: 'green', name: 'Green', value: '#4a8c55', hue: 90 },
-  { id: 'yellow', name: 'Yellow', value: '#e6bd43', hue: 45 },
+export const PAINT_COLORS: { id: PaintColor; name: string; value: string; dark: string }[] = [
+  { id: 'yellow', name: 'Yellow', value: '#f2cf3d', dark: '#d1ae24' },
+  { id: 'pink', name: 'Pink', value: '#f08fb5', dark: '#d06f96' },
+  { id: 'red', name: 'Red', value: '#d9483b', dark: '#b73328' },
+  { id: 'green', name: 'Green', value: '#4fa35b', dark: '#3a8545' },
+  { id: 'blue', name: 'Blue', value: '#4a8fd4', dark: '#3774b3' },
+  { id: 'orange', name: 'Orange', value: '#f08a2c', dark: '#cf7016' },
 ]
 
 export interface Level {
