@@ -94,7 +94,10 @@ header button { background: #6b7d5f; }
 }
 .cell svg.lot-art { position: absolute; inset: 0; width: 100%; height: 100%; transform: none; animation: none; filter: none; z-index: 0; pointer-events: none; }
 .cell svg:not(.lot-art) { position: relative; z-index: 1; }
-.cell .rambler-art { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+.building-art { position: relative; display: block; width: 100%; height: 100%; }
+.cell .building-art { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.cell .rambler-art { position: relative; width: 100%; height: 100%; pointer-events: none; }
+.upgrade-stars { position: absolute; z-index: 2; right: 0; bottom: 1%; left: 0; color: #ffd34d; font-size: clamp(8px, 2vw, 13px); line-height: 1; letter-spacing: .08em; text-align: center; text-shadow: 0 1px 2px #493713, 0 0 3px #fff3b0; }
 .cell.unowned svg.lot-art { opacity: .85; }
 .cell.sold svg.lot-art { filter: grayscale(1); }
 
