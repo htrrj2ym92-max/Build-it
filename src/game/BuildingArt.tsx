@@ -1,7 +1,13 @@
 import { useId, type ReactNode } from 'react'
-import ramblerImage from '../../rambler.png'
+import ramblerPhase1 from '../../Bungalow phase 1.png'
+import ramblerPhase2 from '../../bungalow phase 2.png'
+import ramblerPhase3 from '../../bungalow phase 3.png'
+import ramblerPhase4 from '../../bungalow phase 4.png'
+import ramblerPhase5 from '../../Bungalow phase 5.png'
 import { PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
+
+const ramblerPhases = [ramblerPhase1, ramblerPhase2, ramblerPhase3, ramblerPhase4, ramblerPhase5]
 
 const art: Record<string, ReactNode> = {
   house: (
@@ -170,7 +176,8 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor 
   }
 
   if (type === 'rambler') {
-    return <img className="rambler-art" src={ramblerImage} alt="" aria-hidden="true" />
+    const phase = progress >= 1 ? 4 : Math.min(3, Math.floor(Math.max(0, progress) * 4))
+    return <img className="rambler-art" src={ramblerPhases[phase]} alt="" aria-hidden="true" />
   }
 
   return (
