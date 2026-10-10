@@ -18,6 +18,8 @@ main { display: grid; gap: 10px; grid-template-columns: 1fr; }
 .cell:focus-visible { outline: 3px solid #f1a53e; outline-offset: 2px; }
 .cell svg { display: block; width: 100%; height: 100%; padding: 0; transform: scale(1.12); transform-origin: 50% 60%; filter: drop-shadow(0 4px 3px #38563850); animation: pop .35s ease-out; }
 .rambler-art { position: relative; display: block; width: 100%; height: 100%; }
+.rambler-art { container-type: size; }
+.rambler-stage { position: absolute; left: 50%; top: 50%; width: min(100cqw, 150.2cqh); aspect-ratio: 1537 / 1023; transform: translate(-50%, -50%); }
 .rambler-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .rambler-paint { position: absolute; inset: 0; mix-blend-mode: color; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-position: center; mask-position: center; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .cell.building { background: linear-gradient(145deg,#ecd99e,#c3aa71); }

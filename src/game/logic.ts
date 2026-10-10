@@ -1,4 +1,4 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import { BUILDINGS, CONDITION_DECAY_TICKS, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
 import type { BuildingType, Cell, GameState, PaintColor } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
@@ -117,12 +117,19 @@ export function landscape(g: GameState, index: number): GameState {
 
 export function paintBuilding(g: GameState, index: number, color: PaintColor = PAINT_COLORS[0].id): GameState {
   const cell = g.grid[index]
-  if (!cell?.type || !isOwned(cell) || cell.remaining > 0 || (cell.painted && cell.paintColor === color)) return g
+  if (!cell?.type || !isOwned(cell) || cell.remaining > 0 || cell.paintingColor || (cell.painted && cell.paintColor === color)) return g
   const cost = improvementCost(cell.type)
   if (g.resources.materials < cost) return g
   const grid = g.grid.slice()
-  grid[index] = { ...cell, painted: true, paintColor: color }
+  grid[index] = { ...cell, paintingColor: color, paintRemaining: PAINT_TIME, paintDuration: PAINT_TIME }
   return { ...g, resources: { ...g.resources, materials: g.resources.materials - cost }, grid }
+}
+
+/** 0 = not painting; 1..3 = visible stages (25%, 50%, 75% painted) while a paint job runs */
+export function paintStage(c: Cell): 0 | 1 | 2 | 3 {
+  if (!c.paintingColor || !c.paintRemaining || !c.paintDuration) return 0
+  const elapsed = (c.paintDuration - c.paintRemaining) / c.paintDuration
+  return elapsed < 0.25 ? 1 : elapsed < 0.5 ? 2 : 3
 }
 
 export const improvementCost = (type: BuildingType) => Math.floor(BUILDINGS[type].cost / 10)
@@ -211,7 +218,14 @@ export function tick(g: GameState): GameState {
   const resources = { ...g.resources }
   const ticks = g.ticks + 1
   const decay = ticks % CONDITION_DECAY_TICKS === 0
-  const grid: Cell[] = g.grid.map((c) => {
+  const grid: Cell[] = g.grid.map((raw) => {
+    let c = raw
+    if (c.paintingColor) {
+      const paintRemaining = Math.max(0, (c.paintRemaining ?? 0) - 1)
+      c = paintRemaining === 0
+        ? { ...c, painted: true, paintColor: c.paintingColor, paintingColor: undefined, paintRemaining: undefined, paintDuration: undefined }
+        : { ...c, paintRemaining }
+    }
     if (c.type && c.remaining > 0) {
       const remaining = Math.max(0, c.remaining - 1)
       return remaining === 0
@@ -248,6 +262,7 @@ export function isValid(s: unknown): s is GameState {
       (c.taskDuration === undefined || (Number.isFinite(c.taskDuration) && c.taskDuration > 0)) &&
       (c.upgradePending === undefined || typeof c.upgradePending === 'boolean') &&
       (c.painted === undefined || typeof c.painted === 'boolean') &&
+      (c.paintingColor === undefined || (PAINT_COLORS.some(({ id }) => id === c.paintingColor) && Number.isFinite(c.paintRemaining) && Number.isFinite(c.paintDuration) && (c.paintDuration as number) > 0)) &&
       (c.paintColor === undefined || PAINT_COLORS.some(({ id }) => id === c.paintColor)) &&
       (c.landscaped === undefined || typeof c.landscaped === 'boolean') &&
       (c.condition === undefined || (typeof c.condition === 'number' && c.condition >= 0 && c.condition <= 100)))
