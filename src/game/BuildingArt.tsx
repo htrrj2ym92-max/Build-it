@@ -4,11 +4,16 @@ import ramblerPhase2 from '../../bungalow phase 2.png'
 import ramblerPhase3 from '../../bungalow phase 3.png'
 import ramblerPhase4 from '../../bungalow phase 4.png'
 import ramblerPhase5 from '../../Bungalow phase 5.png'
+import colonialPhase1 from '../../colonial 1.png'
+import colonialPhase2 from '../../colonial 2.png'
+import colonialPhase3 from '../../colonial 3.png'
+import colonialPhase4 from '../../colonial 4.png'
 import ramblerWallMask from './rambler-walls-mask.png'
 import { MAX_UPGRADE, PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
 
 const ramblerPhases = [ramblerPhase1, ramblerPhase2, ramblerPhase3, ramblerPhase4, ramblerPhase5]
+const colonialPhases = [colonialPhase1, colonialPhase2, colonialPhase3, colonialPhase4]
 
 // Vertical extent (% of the rambler image) of the wall mask, used to band the paint reveal
 const RAMBLER_WALL_TOP = 49.6
@@ -193,6 +198,18 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor,
     castle: '#aeb8b5',
     workshop: '#bd9a6e',
     sawmill: '#bd9a6e',
+  }
+
+  if (type === 'colonial') {
+    const phase = progress >= 1 ? 3 : Math.min(3, Math.floor(Math.max(0, progress) * 4))
+    return (
+      <div className="building-art" aria-hidden="true">
+        <div className="colonial-stage">
+          <img src={colonialPhases[phase]} alt="" />
+        </div>
+        {level > 0 && <span className="upgrade-stars">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
+      </div>
+    )
   }
 
   if (type === 'rambler') {
