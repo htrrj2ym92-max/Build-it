@@ -23,7 +23,7 @@ main { display: grid; gap: 10px; grid-template-columns: 1fr; }
 .rambler-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .colonial-stage { position: absolute; inset: 0; display: grid; place-items: center; }
 .colonial-stage img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.rambler-paint { position: absolute; inset: 0; mix-blend-mode: color; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-position: center; mask-position: center; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.rambler-paint { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-position: center; mask-position: center; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .cell.building { background: linear-gradient(145deg,#ecd99e,#c3aa71); }
 .timer { position: absolute; right: 5px; bottom: 5px; border-radius: 999px; padding: 3px 7px; background: #344b32e8; color: #fff; font-size: .7rem; line-height: 1.2; box-shadow: 0 1px 3px #0004; }
 .cell-progress, .task-progress { display: block; height: 8px; overflow: hidden; border: 1px solid #668b48; border-radius: 999px; background: #e7f2bd; box-shadow: 0 1px 3px #344b2b55; }

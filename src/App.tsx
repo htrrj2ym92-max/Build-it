@@ -3,7 +3,7 @@ import { BUILDINGS, BUILDING_ORDER, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_D
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
 import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, demolish, goalProgress, hasSawmill, hasWorkshop, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, paintStage, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
-import { clearSave, loadGame, saveGame } from './game/storage'
+import { loadGame, saveGame } from './game/storage'
 import type { BuildingType, GameState, PaintColor } from './game/types'
 
 type Tool = 'build' | 'demolish'
@@ -119,9 +119,10 @@ export default function App() {
     `${BUILDINGS[type].cost.toLocaleString()} materials`
 
   const reset = () => {
-    if (window.confirm('Start over? All progress will be lost.')) {
-      clearSave()
-      setGame(newGame())
+    if (window.confirm('Restart this level? Progress on this level will be lost.')) {
+      setGame(newGame(game.level))
+      setSelectedLot(null)
+      setSelectedBuilding(null)
     }
   }
 
@@ -130,7 +131,7 @@ export default function App() {
       <header>
         <h1>🏗️ Build It</h1>
         <span>Level {game.level + 1}{game.level >= LEVELS.length ? ' (bonus)' : ''}</span>
-        <button onClick={reset}>Restart</button>
+        <button onClick={reset}>Restart level</button>
       </header>
 
       <div className="calendar" role="img" aria-label={`Month ${monthNumber}, day ${dayOfMonth} of ${DAYS_PER_MONTH}. Rent is paid at month end.`}>

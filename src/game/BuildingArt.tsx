@@ -13,6 +13,8 @@ import tudorPhase2 from '../../tudor 2.png'
 import tudorPhase3 from '../../tudor 3.png'
 import tudorPhase4 from '../../tudor 4.png'
 import ramblerWallMask from './rambler-walls-mask.png'
+import colonialWallMask from './colonial-walls-mask.png'
+import tudorWallMask from './tudor-walls-mask.png'
 import { MAX_UPGRADE, PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
 
@@ -23,6 +25,12 @@ const tudorPhases = [tudorPhase1, tudorPhase2, tudorPhase3, tudorPhase4]
 // Vertical extent (% of the rambler image) of the wall mask, used to band the paint reveal
 const RAMBLER_WALL_TOP = 49.6
 const RAMBLER_WALL_BOTTOM = 92.2
+
+// Same idea for the other photo-style houses: wall mask plus its vertical extent (%)
+const photoWalls = {
+  colonial: { mask: colonialWallMask, top: 26, bottom: 83 },
+  tudor: { mask: tudorWallMask, top: 28, bottom: 88 },
+}
 
 // Approximate vertical extent (SVG y) of the exterior walls for each drawn building
 const wallExtent: Partial<Record<BuildingType, [number, number]>> = {
@@ -211,6 +219,18 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor,
       <div className="building-art" aria-hidden="true">
         <div className="colonial-stage">
           <img src={colonialPhases[phase]} alt="" />
+          {phase === 3 && paint && <div className="rambler-paint" style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${photoWalls.colonial.mask})`, maskImage: `url(${photoWalls.colonial.mask})` }} />}
+          {phase === 3 && newPaint && (
+            <div
+              className="rambler-paint"
+              style={{
+                backgroundColor: newPaint.value,
+                WebkitMaskImage: `url(${photoWalls.colonial.mask})`,
+                maskImage: `url(${photoWalls.colonial.mask})`,
+                clipPath: `inset(${photoWalls.colonial.bottom - bandFraction * (photoWalls.colonial.bottom - photoWalls.colonial.top)}% 0 0 0)`,
+              }}
+            />
+          )}
         </div>
         {level > 0 && <span className="upgrade-stars">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
       </div>
@@ -223,6 +243,18 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor,
       <div className="building-art" aria-hidden="true">
         <div className="colonial-stage">
           <img src={tudorPhases[phase]} alt="" />
+          {phase === 3 && paint && <div className="rambler-paint" style={{ backgroundColor: paint.value, WebkitMaskImage: `url(${photoWalls.tudor.mask})`, maskImage: `url(${photoWalls.tudor.mask})` }} />}
+          {phase === 3 && newPaint && (
+            <div
+              className="rambler-paint"
+              style={{
+                backgroundColor: newPaint.value,
+                WebkitMaskImage: `url(${photoWalls.tudor.mask})`,
+                maskImage: `url(${photoWalls.tudor.mask})`,
+                clipPath: `inset(${photoWalls.tudor.bottom - bandFraction * (photoWalls.tudor.bottom - photoWalls.tudor.top)}% 0 0 0)`,
+              }}
+            />
+          )}
         </div>
         {level > 0 && <span className="upgrade-stars">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
       </div>

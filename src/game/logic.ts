@@ -8,6 +8,13 @@ export const emptyCell = (lotOwned = false): Cell => ({ type: null, lotOwned, re
 /** a finished building the player still owns */
 export const isOwned = (c: Cell) => !!c.type && c.remaining === 0 && !c.sold
 
+/** A few lots are already owned at the start of every level, spread evenly over the board */
+const startingGrid = (cells: number): Cell[] => {
+  const owned = Math.max(1, Math.round(cells / 4))
+  const ownedIndexes = new Set(Array.from({ length: owned }, (_, k) => Math.floor((k + 0.5) * cells / owned)))
+  return Array.from({ length: cells }, (_, i) => emptyCell(ownedIndexes.has(i)))
+}
+
 export const newGame = (level = 0): GameState => ({
   version: 2,
   level,
@@ -16,7 +23,7 @@ export const newGame = (level = 0): GameState => ({
   sawmillBuilt: false,
   money: STARTING_MONEY,
   hiredWorkers: 2,
-  grid: Array.from({ length: levelDef(level).size ** 2 }, () => emptyCell()),
+  grid: startingGrid(levelDef(level).size ** 2),
   ticks: 0,
   won: false,
 })
