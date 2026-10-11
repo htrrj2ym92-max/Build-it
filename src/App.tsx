@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUILDINGS, BUILDING_ORDER, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './game/data'
+import { BUILDINGS, BUILDING_ORDER, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_DELIVERY_TIME, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, TICKS_PER_DAY, DAYS_PER_MONTH, WORKER_HIRE_COSTS } from './game/data'
 import BuildingArt from './game/BuildingArt'
 import LotArt from './game/LotArt'
 import { advanceDeliveries, build, builders, busyBuilders, buyLot, canBuild, demolish, goalProgress, hasSawmill, hasWorkshop, hireWorkers, houseValue, improvementCost, isOwned, landscape, maintain, maintenanceCost, newGame, nextLevel, orderMaterials, paintBuilding, paintStage, rentalIncome, sell, tick, upgrade, upgradeCost, workerHireCost } from './game/logic'
@@ -55,7 +55,8 @@ export default function App() {
   const goals = goalProgress(game)
   const free = builders(game) - busyBuilders(game)
   const gameDay = Math.floor(game.ticks / TICKS_PER_DAY) + 1
-  const gameHour = Math.floor((game.ticks % TICKS_PER_DAY) * 24 / TICKS_PER_DAY)
+  const monthNumber = Math.floor((gameDay - 1) / DAYS_PER_MONTH) + 1
+  const dayOfMonth = (gameDay - 1) % DAYS_PER_MONTH + 1
   const trackedDelivery = game.deliveries.reduce((soonest, delivery) =>
     !soonest || delivery.remaining < soonest.remaining ? delivery : soonest, undefined as GameState['deliveries'][number] | undefined)
   const deliveryDuration = trackedDelivery?.duration ?? MATERIAL_DELIVERY_TIME
@@ -132,10 +133,18 @@ export default function App() {
         <button onClick={reset}>Restart</button>
       </header>
 
+      <div className="calendar" role="img" aria-label={`Month ${monthNumber}, day ${dayOfMonth} of ${DAYS_PER_MONTH}. Rent is paid at month end.`}>
+        <strong>📅 Month {monthNumber}</strong>
+        <div className="calendar-days">
+          {Array.from({ length: DAYS_PER_MONTH }, (_, i) => (
+            <span key={i} className={i + 1 < dayOfMonth ? 'day past' : i + 1 === dayOfMonth ? 'day today' : 'day'}>{i + 1}</span>
+          ))}
+        </div>
+      </div>
+
       <div className="stats">
         <span className="money">💵 ${Math.floor(game.money).toLocaleString()}</span>
-        <span className="rent">🏠 ${rent.toLocaleString()}/day rent</span>
-        <span>🕒 Day {gameDay}, {String(gameHour).padStart(2, '0')}:00</span>
+        <span className="rent">🏠 ${rent.toLocaleString()}/month rent</span>
         <button className="pause" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
           {paused ? '▶ Resume' : '⏸ Pause'}
         </button>

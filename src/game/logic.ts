@@ -1,4 +1,4 @@
-import { BUILDINGS, CONDITION_DECAY_TICKS, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, STARTING_MONEY, TICKS_PER_DAY, WORKER_HIRE_COSTS } from './data'
+import { BUILDINGS, CONDITION_DECAY_TICKS, LANDSCAPE_TIME, LEVELS, LOT_COST, MATERIAL_ORDERS, MAX_UPGRADE, PAINT_COLORS, PAINT_TIME, STARTING_MONEY, TICKS_PER_DAY, DAYS_PER_MONTH, WORKER_HIRE_COSTS } from './data'
 import type { BuildingType, Cell, GameState, PaintColor } from './types'
 
 export const levelDef = (level: number) => LEVELS[Math.min(level, LEVELS.length - 1)]
@@ -199,7 +199,7 @@ export function orderMaterials(g: GameState, order: typeof MATERIAL_ORDERS[numbe
 
 const RENT_MULTIPLIERS = [1, 1.2, 1.6, 2]
 
-const houseRent = (c: Cell) => (c.type && isOwned(c) ? BUILDINGS[c.type].rentPerDay * RENT_MULTIPLIERS[c.level] : 0)
+const houseRent = (c: Cell) => (c.type && isOwned(c) ? BUILDINGS[c.type].rentPerMonth * RENT_MULTIPLIERS[c.level] : 0)
 
 export const rentalIncome = (g: GameState) => g.grid.reduce((sum, c) => sum + houseRent(c), 0)
 
@@ -242,7 +242,7 @@ export function tick(g: GameState): GameState {
       ? { ...c, condition: c.condition - 1 }
       : c
   })
-  const rent = ticks % TICKS_PER_DAY === 0 ? rentalIncome({ ...g, grid }) : 0
+  const rent = ticks % (TICKS_PER_DAY * DAYS_PER_MONTH) === 0 ? rentalIncome({ ...g, grid }) : 0
   const next = { ...g, resources, money: g.money + rent, grid, ticks }
   return { ...next, won: goalProgress(next).every((i) => i.have >= i.need) }
 }
