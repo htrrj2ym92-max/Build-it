@@ -15,6 +15,7 @@ export const newGame = (level = 0): GameState => ({
   deliveries: [],
   sawmillBuilt: false,
   money: STARTING_MONEY,
+  hiredWorkers: 2,
   grid: Array.from({ length: levelDef(level).size ** 2 }, () => emptyCell()),
   ticks: 0,
   won: false,
