@@ -8,12 +8,17 @@ import colonialPhase1 from '../../colonial 1.png'
 import colonialPhase2 from '../../colonial 2.png'
 import colonialPhase3 from '../../colonial 3.png'
 import colonialPhase4 from '../../colonial 4.png'
+import tudorPhase1 from '../../tudor 1.png'
+import tudorPhase2 from '../../tudor 2.png'
+import tudorPhase3 from '../../tudor 3.png'
+import tudorPhase4 from '../../tudor 4.png'
 import ramblerWallMask from './rambler-walls-mask.png'
 import { MAX_UPGRADE, PAINT_COLORS } from './data'
 import type { BuildingType, PaintColor } from './types'
 
 const ramblerPhases = [ramblerPhase1, ramblerPhase2, ramblerPhase3, ramblerPhase4, ramblerPhase5]
 const colonialPhases = [colonialPhase1, colonialPhase2, colonialPhase3, colonialPhase4]
+const tudorPhases = [tudorPhase1, tudorPhase2, tudorPhase3, tudorPhase4]
 
 // Vertical extent (% of the rambler image) of the wall mask, used to band the paint reveal
 const RAMBLER_WALL_TOP = 49.6
@@ -206,6 +211,18 @@ export default function BuildingArt({ type, progress = 1, level = 0, paintColor,
       <div className="building-art" aria-hidden="true">
         <div className="colonial-stage">
           <img src={colonialPhases[phase]} alt="" />
+        </div>
+        {level > 0 && <span className="upgrade-stars">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
+      </div>
+    )
+  }
+
+  if (type === 'tudor') {
+    const phase = progress >= 1 ? 3 : Math.min(3, Math.floor(Math.max(0, progress) * 4))
+    return (
+      <div className="building-art" aria-hidden="true">
+        <div className="colonial-stage">
+          <img src={tudorPhases[phase]} alt="" />
         </div>
         {level > 0 && <span className="upgrade-stars">{'★'.repeat(Math.min(MAX_UPGRADE, level))}</span>}
       </div>
